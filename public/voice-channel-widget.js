@@ -420,32 +420,54 @@
 
     _showUpdateBanner() {
       if (document.getElementById('vc-update-banner')) return;
-      const banner = document.createElement('div');
-      banner.id = 'vc-update-banner';
-      banner.className = 'fixed top-6 left-6 right-6 z-[999999] bg-gradient-to-r from-amber-500 to-orange-600 text-white p-5 rounded-3xl shadow-[0_20px_50px_rgba(245,158,11,0.5)] flex flex-col items-center justify-center gap-2 transform transition-all duration-700 -translate-y-full opacity-0';
-      banner.innerHTML = `
-        <div class="font-black text-xl tracking-tight flex items-center gap-2">
-          <svg class="w-6 h-6 animate-spin-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-          ¡Actualización Disponible!
+      
+      const overlay = document.createElement('div');
+      overlay.id = 'vc-update-banner';
+      overlay.className = 'fixed inset-0 z-[999999] bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 opacity-0 transition-opacity duration-500';
+      
+      const modal = document.createElement('div');
+      modal.className = 'bg-zinc-900 border border-zinc-800 rounded-2xl p-6 w-full max-w-sm shadow-2xl transform scale-95 transition-transform duration-500 flex flex-col items-center text-center';
+      
+      modal.innerHTML = `
+        <div class="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-300 mb-4 shadow-inner">
+          <svg class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
         </div>
-        <div class="text-sm font-medium text-center opacity-90 mb-2">Hay nuevas mejoras para la app.</div>
-        <button id="vc-update-btn" class="bg-white text-orange-600 font-black px-8 py-3 rounded-full shadow-lg hover:scale-105 active:scale-95 transition-transform uppercase text-xs tracking-[0.2em] w-full max-w-[200px]">
-          Instalar Ahora
-        </button>
+        <div class="font-bold text-lg text-white mb-2 tracking-tight">Actualización Disponible</div>
+        <div class="text-sm text-zinc-400 mb-6 leading-relaxed">Hay una nueva versión de la aplicación con mejoras y correcciones.</div>
+        <div class="flex gap-3 w-full">
+          <button id="vc-update-skip" class="flex-1 bg-zinc-800 text-zinc-300 font-semibold py-3 rounded-xl hover:bg-zinc-700 transition-colors text-sm">Omitir</button>
+          <button id="vc-update-btn" class="flex-1 bg-zinc-100 text-zinc-900 font-bold py-3 rounded-xl hover:bg-white transition-colors text-sm shadow-md">Actualizar</button>
+        </div>
       `;
-      document.body.appendChild(banner);
+      
+      overlay.appendChild(modal);
+      document.body.appendChild(overlay);
 
+      // Animate in
       setTimeout(() => {
-        banner.classList.remove('-translate-y-full', 'opacity-0');
-      }, 1000);
+        overlay.classList.remove('opacity-0');
+        modal.classList.remove('scale-95');
+      }, 50);
+
+      const closeModal = () => {
+        overlay.classList.add('opacity-0');
+        modal.classList.add('scale-95');
+        setTimeout(() => overlay.remove(), 500);
+      };
+
+      // Close events
+      document.getElementById('vc-update-skip').addEventListener('click', closeModal);
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) closeModal();
+      });
 
       document.getElementById('vc-update-btn').addEventListener('click', () => {
-        window.open('https://github.com/jusephkanade/28channelvoiceapp/releases/download/latest/app-release.apk', '_system');
-        banner.innerHTML = '<div class="font-black text-lg text-center">Descargando... ⏳<br><span class="text-xs font-normal opacity-80 mt-1 block">Abre el archivo descargado para actualizar.</span></div>';
-        setTimeout(() => {
-          banner.classList.add('-translate-y-full', 'opacity-0');
-          setTimeout(() => banner.remove(), 700);
-        }, 10000);
+        // Bypass cache with timestamp query param
+        window.open('https://github.com/jusephkanade/28channelvoiceapp/releases/download/latest/app-release.apk?t=' + Date.now(), '_system');
+        
+        modal.innerHTML = '<div class="font-bold text-zinc-300 my-6">Descargando...<br><span class="text-xs font-normal opacity-70 mt-2 block">Abre el archivo descargado para instalarlo.</span></div>';
+        
+        setTimeout(closeModal, 10000);
       });
     }
 

@@ -78,6 +78,14 @@ onAuthStateChanged(auth, async (user) => {
   } else {
     window.yaireVcHistoryData = [];
   }
+  
+  // Hide the initial loader now that the app is ready
+  const loader = document.getElementById('initial-loader');
+  if (loader) {
+    loader.style.opacity = '0';
+    setTimeout(() => loader.remove(), 500);
+  }
+
   if (window.voiceWidget) {
     window.voiceWidget.updateTranslations();
   }

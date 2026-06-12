@@ -288,6 +288,12 @@
   .vc-light-theme .bg-black\\/40 { background-color: rgba(0,0,0,0.05) !important; }
   .vc-light-theme .bg-black\\/60 { background-color: rgba(0,0,0,0.05) !important; }
   .vc-light-theme .bg-zinc-800 { background-color: #e5e7eb !important; color: #111827 !important; }
+  .vc-light-theme .bg-zinc-700 { background-color: #d1d5db !important; color: #111827 !important; }
+  .vc-light-theme .bg-zinc-600 { background-color: #9ca3af !important; }
+  .vc-light-theme .border-zinc-800 { border-color: #d1d5db !important; }
+  .vc-light-theme .text-zinc-300 { color: #374151 !important; }
+  .vc-light-theme .text-zinc-400 { color: #4b5563 !important; }
+  .vc-light-theme .text-zinc-500 { color: #6b7280 !important; }
   .vc-light-theme .bg-zinc-900\\/50 { background-color: rgba(255,255,255,0.8) !important; }
   .vc-light-theme .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important; }
   `;
@@ -968,7 +974,12 @@
               </div>
             </div>
           </div>
-          <button class="text-white/30 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors" id="vc-close">✕</button>
+          <div class="flex items-center gap-1">
+            <button class="text-white/30 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors ${isConfig ? 'bg-white/10 text-white' : ''}" id="vc-tab-config" title="Configuración">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            </button>
+            <button class="text-white/30 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors" id="vc-close">✕</button>
+          </div>
         </div>
 
         <!-- Navigation Tabs -->
@@ -981,10 +992,6 @@
           </button>
           <button class="min-w-[70px] flex-1 py-1.5 text-xs font-medium rounded-md transition-all flex items-center justify-center gap-1.5 ${isMusic ? 'bg-zinc-800 text-white shadow-md' : 'text-white/40 hover:text-white/80'}" id="vc-tab-music">
              ${_t('vc_music')} ${this._musicPlaying ? `<div class="flex items-end gap-[1px] h-2.5 vc-music-ind"><div class="w-[2px] bg-amber-500 animate-[vc-eq_0.8s_ease-in-out_infinite]"></div><div class="w-[2px] bg-amber-500 animate-[vc-eq_0.8s_ease-in-out_infinite_0.2s]"></div><div class="w-[2px] bg-amber-500 animate-[vc-eq_0.8s_ease-in-out_infinite_0.4s]"></div></div>` : ''}
-          </button>
-          <button class="min-w-[40px] px-2 py-1.5 flex items-center justify-center rounded-md transition-all ${isConfig ? 'bg-zinc-800 text-white shadow-md' : 'text-white/40 hover:text-white/80'}" id="vc-tab-config" title="Configuración">
-             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-          </button>
         </div>
 
         <!-- Main Content Area -->

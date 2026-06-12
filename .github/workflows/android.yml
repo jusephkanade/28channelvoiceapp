@@ -45,7 +45,7 @@ jobs:
       - name: Build Android APK (Release)
         run: |
           cd android
-          ./gradlew assembleRelease -Pandroid.injected.signing.store.file=app/release.keystore -Pandroid.injected.signing.store.password=password -Pandroid.injected.signing.key.alias=release -Pandroid.injected.signing.key.password=password
+          ./gradlew assembleRelease -Pandroid.injected.signing.store.file=$(pwd)/app/release.keystore -Pandroid.injected.signing.store.password=password -Pandroid.injected.signing.key.alias=release -Pandroid.injected.signing.key.password=password
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4

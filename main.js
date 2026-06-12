@@ -1,6 +1,7 @@
 // main.js - Entry point for the mobile app
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js';
-import { getAuth, signInWithPopup, getRedirectResult, GoogleAuthProvider, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js';
+import { getAuth, signInWithCredential, getRedirectResult, GoogleAuthProvider, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js';
+import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 
 const firebaseConfig = {
     apiKey: "AIzaSyDFkuktrXnsV9-jg2bv5dpJQRR-he8PT3g",
@@ -27,7 +28,10 @@ document.addEventListener('click', (e) => {
     btn.innerHTML = '<div class="w-4 h-4 rounded-full border-2 border-white/20 border-t-white animate-spin"></div> Abriendo Google...';
     btn.disabled = true;
     
-    signInWithPopup(auth, provider).then(() => {
+    FirebaseAuthentication.signInWithGoogle().then(result => {
+      const credential = GoogleAuthProvider.credential(result.credential.idToken, result.credential.accessToken);
+      return signInWithCredential(auth, credential);
+    }).then(() => {
       // Login exitoso, el observer onAuthStateChanged se encargará
       btn.innerHTML = 'Conectado';
     }).catch(err => {

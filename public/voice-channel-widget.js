@@ -1547,11 +1547,15 @@
 
       const doConnect = () => {
         this.socket = io(SIGNALING_URL, {
-          transports: ['websocket'],
+          transports: ['polling', 'websocket'],
           reconnection: true,
           reconnectionAttempts: 10,
           reconnectionDelay: 1500,
           timeout: 20000
+        });
+
+        this.socket.on('connect_error', (err) => {
+          console.error('[VC] ❌ Socket Connection Error:', err.message);
         });
 
         this.socket.on('connect', () => {

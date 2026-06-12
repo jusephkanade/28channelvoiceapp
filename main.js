@@ -1,6 +1,7 @@
 // main.js - Entry point for the mobile app
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js';
 import { getAuth, signInWithCredential, getRedirectResult, GoogleAuthProvider, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js';
+import { getDatabase, ref, get, set } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js';
 import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 
 const firebaseConfig = {
@@ -15,7 +16,34 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getDatabase(app);
 const provider = new GoogleAuthProvider();
+
+// --- VC HISTORY WRAPPERS ---
+window.yaireVcHistoryGet = async () => {
+    if (!window.yaireCurrentUser) return [];
+    try {
+        const snap = await get(ref(db, `users/${window.yaireCurrentUser.uid}/vc_history`));
+        return snap.exists() ? snap.val() : [];
+    } catch (e) {
+        console.error("Error fetching VC history:", e);
+        return [];
+    }
+};
+
+window.yaireVcHistoryAdd = async (sessionData) => {
+    if (!window.yaireCurrentUser) return;
+    if (!window.yaireVcHistoryData) window.yaireVcHistoryData = [];
+    window.yaireVcHistoryData.unshift(sessionData);
+    window.yaireVcHistoryData = window.yaireVcHistoryData.slice(0, 50);
+
+    try {
+        const historyRef = ref(db, `users/${window.yaireCurrentUser.uid}/vc_history`);
+        await set(historyRef, window.yaireVcHistoryData);
+    } catch (e) {
+        console.error("Error saving VC history:", e);
+    }
+};
 
 // Intercept Google Login button clicks (using capture phase)
 document.addEventListener('click', (e) => {
@@ -43,8 +71,13 @@ document.addEventListener('click', (e) => {
 }, true);
 
 // Listen for Authentication state
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
   window.yaireCurrentUser = user;
+  if (user) {
+    window.yaireVcHistoryData = await window.yaireVcHistoryGet();
+  } else {
+    window.yaireVcHistoryData = [];
+  }
   if (window.voiceWidget) {
     window.voiceWidget.updateTranslations();
   }

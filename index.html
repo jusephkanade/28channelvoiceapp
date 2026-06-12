@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>28E Voice</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Prevent text selection and pull-to-refresh on mobile */
+    body {
+      margin: 0;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      background-color: #000;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    /* Mobile specific adjustments */
+    #app-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* We will use the same ID structure to make porting voice-channel-widget.js easier */
+    #vc-widget {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .vc-glass {
+      background: rgba(20, 20, 20, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+  </style>
+</head>
+<body class="bg-black text-white antialiased">
+  <div id="app-container">
+    <div id="vc-root" class="w-full h-full">
+      <!-- The voice channel widget UI will be injected here by main.js -->
+    </div>
+  </div>
+  
+  <!-- We include socket.io client -->
+  <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+  <!-- We include GSAP for smooth animations -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  
+  <script src="/voice-channel-widget.js"></script>
+  <script type="module" src="/main.js"></script>
+</body>
+</html>

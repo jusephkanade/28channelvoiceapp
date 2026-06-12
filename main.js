@@ -56,8 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     const panel = document.getElementById('vc-panel');
     if (panel) {
-      // Force panel to be open and full screen
-      panel.className = 'fixed inset-0 w-full h-full bg-zinc-950 flex flex-col z-50 font-sans overflow-hidden !opacity-100 !scale-100 !pointer-events-auto !translate-y-0';
+      // Force panel to be open and full screen (removing exclamation marks from class names so JS logic works)
+      panel.className = 'fixed inset-0 w-full h-full bg-zinc-950 flex flex-col z-50 font-sans overflow-hidden opacity-100 scale-100 pointer-events-auto translate-y-0';
       
       // Hide the toggle bar completely
       const bar = document.getElementById('vc-bar');

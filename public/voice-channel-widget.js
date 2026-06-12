@@ -271,6 +271,25 @@
   @keyframes vc-marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
   .vc-marquee-container { display: flex; overflow: hidden; white-space: nowrap; mask-image: linear-gradient(to right, transparent, black 10px, black calc(100% - 10px), transparent); -webkit-mask-image: linear-gradient(to right, transparent, black 10px, black calc(100% - 10px), transparent); width: 100%; }
   .vc-marquee-content { flex-shrink: 0; animation: vc-marquee 12s linear infinite; padding-right: 2rem; }
+  
+  .vc-light-theme .bg-zinc-950 { background-color: #f3f4f6 !important; }
+  .vc-light-theme .bg-zinc-900 { background-color: #ffffff !important; }
+  .vc-light-theme .text-white { color: #111827 !important; }
+  .vc-light-theme .text-white\\/70 { color: rgba(17,24,39,0.7) !important; }
+  .vc-light-theme .text-white\\/40 { color: rgba(17,24,39,0.5) !important; }
+  .vc-light-theme .text-white\\/30 { color: rgba(17,24,39,0.5) !important; }
+  .vc-light-theme .text-white\\/20 { color: rgba(17,24,39,0.5) !important; }
+  .vc-light-theme .bg-white\\/5 { background-color: rgba(0,0,0,0.05) !important; }
+  .vc-light-theme .bg-white\\/10 { background-color: rgba(0,0,0,0.1) !important; }
+  .vc-light-theme .bg-white\\/20 { background-color: rgba(0,0,0,0.2) !important; }
+  .vc-light-theme .border-white\\/10 { border-color: rgba(0,0,0,0.1) !important; }
+  .vc-light-theme .border-white\\/5 { border-color: rgba(0,0,0,0.05) !important; }
+  .vc-light-theme .bg-black { background-color: #e5e7eb !important; color: #111827 !important; }
+  .vc-light-theme .bg-black\\/40 { background-color: rgba(0,0,0,0.05) !important; }
+  .vc-light-theme .bg-black\\/60 { background-color: rgba(0,0,0,0.05) !important; }
+  .vc-light-theme .bg-zinc-800 { background-color: #e5e7eb !important; color: #111827 !important; }
+  .vc-light-theme .bg-zinc-900\\/50 { background-color: rgba(255,255,255,0.8) !important; }
+  .vc-light-theme .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important; }
   `;
 
   // ── ICONS ─────────────────────────────────────────────────────────────────
@@ -461,13 +480,40 @@
         if (e.target === overlay) closeModal();
       });
 
-      document.getElementById('vc-update-btn').addEventListener('click', () => {
-        // Bypass cache with timestamp query param
-        window.open('https://github.com/jusephkanade/28channelvoiceapp/releases/download/latest/app-release.apk?t=' + Date.now(), '_system');
+      document.getElementById('vc-update-btn').addEventListener('click', async () => {
+        if (!window.appUpdateDownload) {
+          window.open('https://github.com/jusephkanade/28channelvoiceapp/releases/download/latest/app-release.apk?t=' + Date.now(), '_system');
+          modal.innerHTML = '<div class="font-bold text-zinc-300 my-6">Descargando...<br><span class="text-xs font-normal opacity-70 mt-2 block">Abre el archivo descargado para instalarlo.</span></div>';
+          setTimeout(closeModal, 10000);
+          return;
+        }
+
+        modal.innerHTML = `
+          <div class="font-bold text-white mb-4">Descargando actualización...</div>
+          <div class="w-full bg-black/40 rounded-full h-2 mb-4 overflow-hidden relative">
+            <div class="h-full bg-amber-500 absolute left-0 top-0 w-full animate-pulse origin-left" style="animation: vc-eq 1s infinite"></div>
+          </div>
+          <div class="text-xs text-zinc-400">Por favor, no cierres la app.</div>
+        `;
         
-        modal.innerHTML = '<div class="font-bold text-zinc-300 my-6">Descargando...<br><span class="text-xs font-normal opacity-70 mt-2 block">Abre el archivo descargado para instalarlo.</span></div>';
+        const apkUrl = 'https://github.com/jusephkanade/28channelvoiceapp/releases/download/latest/app-release.apk?t=' + Date.now();
+        const downloadedPath = await window.appUpdateDownload(apkUrl);
         
-        setTimeout(closeModal, 10000);
+        if (downloadedPath) {
+          modal.innerHTML = `
+            <div class="font-bold text-green-400 mb-2">¡Descarga completa!</div>
+            <div class="text-sm text-zinc-300 mb-6">Iniciando instalador...</div>
+            <div class="text-xs text-zinc-500">Acepta los permisos de instalación si el sistema te los pide.</div>
+          `;
+          await window.appUpdateInstall();
+          setTimeout(closeModal, 5000);
+        } else {
+          modal.innerHTML = `
+            <div class="font-bold text-red-500 mb-4">Error al descargar</div>
+            <button id="vc-update-err-close" class="bg-zinc-800 text-zinc-300 px-6 py-2 rounded-xl text-sm">Cerrar</button>
+          `;
+          document.getElementById('vc-update-err-close').addEventListener('click', closeModal);
+        }
       });
     }
 
@@ -907,6 +953,7 @@
       const isRoom = this._activeTab === 'room';
       const isChat = this._activeTab === 'chat';
       const isMusic = this._activeTab === 'music';
+      const isConfig = this._activeTab === 'config';
 
       return `
         <!-- Header -->
@@ -925,19 +972,18 @@
         </div>
 
         <!-- Navigation Tabs -->
-        <div class="flex items-center px-2 py-1 mx-5 mt-2 bg-black/40 rounded-lg p-1">
-          <button class="flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${isRoom ? 'bg-zinc-800 text-white shadow-md' : 'text-white/40 hover:text-white/80'}" id="vc-tab-room">
+        <div class="flex items-center px-2 py-1 mx-5 mt-2 bg-black/40 rounded-lg p-1 overflow-x-auto vc-scroll hide-scrollbar gap-1">
+          <button class="min-w-[70px] flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${isRoom ? 'bg-zinc-800 text-white shadow-md' : 'text-white/40 hover:text-white/80'}" id="vc-tab-room">
              ${_t('vc_tab_room')}
           </button>
-          <button class="flex-1 py-1.5 text-xs font-medium rounded-md transition-all relative ${isChat ? 'bg-zinc-800 text-white shadow-md' : 'text-white/40 hover:text-white/80'}" id="vc-tab-chat">
+          <button class="min-w-[70px] flex-1 py-1.5 text-xs font-medium rounded-md transition-all relative ${isChat ? 'bg-zinc-800 text-white shadow-md' : 'text-white/40 hover:text-white/80'}" id="vc-tab-chat">
              ${_t('vc_chat')} ${this._chatUnread > 0 ? `<span class="absolute top-0 right-2 w-2 h-2 bg-red-500 rounded-full"></span>` : ''}
           </button>
-          <button class="flex-1 py-1.5 text-xs font-medium rounded-md transition-all flex items-center justify-center gap-1.5 ${isMusic ? 'bg-zinc-800 text-white shadow-md' : 'text-white/40 hover:text-white/80'}" id="vc-tab-music">
-             ${_t('vc_music')} ${this._musicPlaying ? `<div class="flex items-end gap-[1px] h-2.5 vc-music-ind">
-               <div class="w-[2px] bg-amber-500 animate-[vc-eq_0.8s_ease-in-out_infinite]"></div>
-               <div class="w-[2px] bg-amber-500 animate-[vc-eq_0.8s_ease-in-out_infinite_0.2s]"></div>
-               <div class="w-[2px] bg-amber-500 animate-[vc-eq_0.8s_ease-in-out_infinite_0.4s]"></div>
-             </div>` : ''}
+          <button class="min-w-[70px] flex-1 py-1.5 text-xs font-medium rounded-md transition-all flex items-center justify-center gap-1.5 ${isMusic ? 'bg-zinc-800 text-white shadow-md' : 'text-white/40 hover:text-white/80'}" id="vc-tab-music">
+             ${_t('vc_music')} ${this._musicPlaying ? `<div class="flex items-end gap-[1px] h-2.5 vc-music-ind"><div class="w-[2px] bg-amber-500 animate-[vc-eq_0.8s_ease-in-out_infinite]"></div><div class="w-[2px] bg-amber-500 animate-[vc-eq_0.8s_ease-in-out_infinite_0.2s]"></div><div class="w-[2px] bg-amber-500 animate-[vc-eq_0.8s_ease-in-out_infinite_0.4s]"></div></div>` : ''}
+          </button>
+          <button class="min-w-[40px] px-2 py-1.5 flex items-center justify-center rounded-md transition-all ${isConfig ? 'bg-zinc-800 text-white shadow-md' : 'text-white/40 hover:text-white/80'}" id="vc-tab-config" title="Configuración">
+             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
           </button>
         </div>
 
@@ -968,6 +1014,47 @@
           <div class="absolute inset-0 flex flex-col ${isMusic ? 'opacity-100 translate-x-0 pointer-events-auto' : 'opacity-0 translate-x-8 pointer-events-none'}" id="vc-content-music">
             <div class="flex-1 overflow-y-auto vc-scroll flex flex-col" id="vc-music-inner">
                ${this._renderMusicPanel()}
+            </div>
+          </div>
+
+          <!-- CONFIG TAB -->
+          <div class="absolute inset-0 flex flex-col ${isConfig ? 'opacity-100 translate-x-0 pointer-events-auto' : 'opacity-0 translate-x-8 pointer-events-none'}" id="vc-content-config">
+            <div class="flex-1 overflow-y-auto px-5 py-4 vc-scroll">
+              <div class="text-xs text-white/40 font-bold uppercase tracking-widest mb-4">Ajustes de Interfaz</div>
+              
+              <!-- THEME TOGGLE -->
+              <div class="bg-black/20 border border-white/10 rounded-2xl p-4 flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/70">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                  </div>
+                  <div>
+                    <div class="text-white text-sm font-bold">Tema Oscuro</div>
+                    <div class="text-white/40 text-[10px]">Ajusta los colores de la sala</div>
+                  </div>
+                </div>
+                <button id="vc-btn-theme" class="w-12 h-6 rounded-full transition-colors relative ${window.vcLightMode ? 'bg-zinc-600' : 'bg-amber-500'}">
+                  <div class="w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${window.vcLightMode ? 'left-0.5 translate-x-0' : 'left-0.5 translate-x-6'} shadow-sm"></div>
+                </button>
+              </div>
+
+              <div class="text-xs text-white/40 font-bold uppercase tracking-widest mb-4">Sistema</div>
+              
+              <!-- UPDATER -->
+              <div class="bg-black/20 border border-white/10 rounded-2xl p-4">
+                <div class="flex items-center gap-3 mb-4">
+                  <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                  </div>
+                  <div>
+                    <div class="text-white text-sm font-bold">Actualizaciones</div>
+                    <div class="text-white/40 text-[10px]">Descargar nueva versión in-app</div>
+                  </div>
+                </div>
+                <button id="vc-btn-check-update" class="w-full py-3 bg-white/5 hover:bg-white/10 text-white text-xs font-bold rounded-xl transition-colors border border-white/10">
+                  Buscar Actualizaciones
+                </button>
+              </div>
             </div>
           </div>
 
@@ -1238,10 +1325,53 @@
       const tabRoom = document.getElementById('vc-tab-room');
       const tabChat = document.getElementById('vc-tab-chat');
       const tabMusic = document.getElementById('vc-tab-music');
+      const tabConfig = document.getElementById('vc-tab-config');
 
       if (tabRoom) tabRoom.addEventListener('click', () => switchTab('room'));
       if (tabChat) tabChat.addEventListener('click', () => switchTab('chat'));
       if (tabMusic) tabMusic.addEventListener('click', () => switchTab('music'));
+      if (tabConfig) tabConfig.addEventListener('click', () => switchTab('config'));
+
+      // Config Events
+      const btnTheme = document.getElementById('vc-btn-theme');
+      if (btnTheme) {
+        btnTheme.addEventListener('click', () => {
+          window.vcLightMode = !window.vcLightMode;
+          if (window.vcLightMode) {
+            document.body.classList.add('vc-light-theme');
+          } else {
+            document.body.classList.remove('vc-light-theme');
+          }
+          this._render(this._tplConnected());
+        });
+      }
+
+      const btnUpdate = document.getElementById('vc-btn-check-update');
+      if (btnUpdate) {
+        btnUpdate.addEventListener('click', () => {
+          const prevHtml = btnUpdate.innerHTML;
+          btnUpdate.innerHTML = `<svg class="w-4 h-4 animate-spin mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>`;
+          
+          fetch('https://api.github.com/repos/jusephkanade/28channelvoiceapp/commits/master')
+            .then(r => r.json())
+            .then(data => {
+              const latestCommitDate = new Date(data.commit.committer.date).getTime();
+              const myBuildDate = window.APP_BUILD_DATE && !window.APP_BUILD_DATE.includes("BUILD_DATE") ? new Date(window.APP_BUILD_DATE).getTime() : 0;
+              
+              if (latestCommitDate > myBuildDate + 60000) {
+                this._showUpdateBanner();
+                btnUpdate.innerHTML = prevHtml;
+              } else {
+                btnUpdate.textContent = "Ya tienes la última versión";
+                setTimeout(() => btnUpdate.innerHTML = prevHtml, 3000);
+              }
+            })
+            .catch(() => {
+              btnUpdate.textContent = "Error al conectar";
+              setTimeout(() => btnUpdate.innerHTML = prevHtml, 3000);
+            });
+        });
+      }
 
       // Chat send & typing
       const chatSend = document.getElementById('vc-chat-send');

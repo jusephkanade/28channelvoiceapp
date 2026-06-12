@@ -3,7 +3,9 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.1/firebas
 import { getAuth, signInWithCredential, getRedirectResult, GoogleAuthProvider, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js';
 import { getDatabase, ref, get, set } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js';
 import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
-
+import { CapacitorHttp } from '@capacitor/core';
+import { Filesystem, Directory } from '@capacitor/filesystem';
+import { FileOpener } from '@capawesome-team/capacitor-file-opener';
 const firebaseConfig = {
     apiKey: "AIzaSyDFkuktrXnsV9-jg2bv5dpJQRR-he8PT3g",
     authDomain: "yairealvarado.firebaseapp.com",
@@ -28,6 +30,46 @@ window.yaireVcHistoryGet = async () => {
     } catch (e) {
         console.error("Error fetching VC history:", e);
         return [];
+    }
+};
+
+window.closeApp = () => {
+    // If running in Capacitor, try to close
+    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+        window.Capacitor.Plugins.App.exitApp();
+    }
+};
+
+// 🔹 OTA UPDATER BRIDGE 🔹
+window.appUpdateCleanup = async () => {
+    try {
+        await Filesystem.deleteFile({ path: 'app-update.apk', directory: Directory.Cache });
+    } catch (e) {} // ignore if not exists
+};
+
+window.appUpdateDownload = async (url, onProgress) => {
+    try {
+        await window.appUpdateCleanup();
+        // CapacitorHttp.downloadFile doesn't support progress events easily in JS,
+        // but we can just await it. It might take 10-20 seconds.
+        const response = await CapacitorHttp.downloadFile({
+            url: url,
+            filePath: 'app-update.apk',
+            fileDirectory: Directory.Cache
+        });
+        return response.path;
+    } catch (e) {
+        console.error("Download error:", e);
+        return null;
+    }
+};
+
+window.appUpdateInstall = async () => {
+    try {
+        const fileInfo = await Filesystem.getUri({ path: 'app-update.apk', directory: Directory.Cache });
+        await FileOpener.openFile({ path: fileInfo.uri, mimeType: 'application/vnd.android.package-archive' });
+    } catch (e) {
+        console.error("Install error:", e);
     }
 };
 

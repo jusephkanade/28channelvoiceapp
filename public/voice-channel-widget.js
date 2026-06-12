@@ -2792,9 +2792,9 @@
 
   // ── INIT ─────────────────────────────────────────────────────────────────
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => new VoiceChannel());
+    document.addEventListener('DOMContentLoaded', () => { window.voiceWidget = new VoiceChannel(); });
   } else {
-    new VoiceChannel();
+    window.voiceWidget = new VoiceChannel();
   }
 
 })();

@@ -272,6 +272,7 @@
   .vc-marquee-container { display: flex; overflow: hidden; white-space: nowrap; mask-image: linear-gradient(to right, transparent, black 10px, black calc(100% - 10px), transparent); -webkit-mask-image: linear-gradient(to right, transparent, black 10px, black calc(100% - 10px), transparent); width: 100%; }
   .vc-marquee-content { flex-shrink: 0; animation: vc-marquee 12s linear infinite; padding-right: 2rem; }
   
+  body.vc-light-theme { background-color: #f3f4f6 !important; }
   .vc-light-theme .bg-zinc-950 { background-color: #f3f4f6 !important; }
   .vc-light-theme .bg-zinc-900 { background-color: #ffffff !important; }
   .vc-light-theme .text-white { color: #111827 !important; }

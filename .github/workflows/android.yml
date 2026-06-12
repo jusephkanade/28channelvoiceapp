@@ -25,6 +25,9 @@ jobs:
       - name: Build Web Assets
         run: npm run build
 
+      - name: Inject Build Timestamp
+        run: sed -i "s/__BUILD_DATE__/$(date -u +%Y-%m-%dT%H:%M:%SZ)/g" dist/index.html
+
       - name: Inject google-services.json
         env:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
@@ -52,3 +55,14 @@ jobs:
         with:
           name: 28E-Voice-App.apk
           path: android/app/build/outputs/apk/release/app-release.apk
+
+      - name: Create or Update Latest Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: "latest"
+          name: "Latest Build"
+          body: "Auto-generated APK for OTA updates."
+          artifacts: "android/app/build/outputs/apk/release/app-release.apk"
+          allowUpdates: true
+          makeLatest: true
+          token: ${{ secrets.GITHUB_TOKEN }}

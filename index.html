@@ -98,6 +98,11 @@
   <!-- We include GSAP for smooth animations -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   
+  <script>
+    // This value is injected by GitHub Actions during the build process
+    window.APP_BUILD_DATE = "__BUILD_DATE__";
+  </script>
+
   <script src="/voice-channel-widget.js"></script>
   <script type="module" src="/main.js"></script>
 </body>

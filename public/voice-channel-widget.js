@@ -400,8 +400,53 @@
       };
 
       this._injectCSS();
-      this._injectCSS();
       this._buildUI();
+      this._checkForUpdates();
+    }
+
+    _checkForUpdates() {
+      if (!window.APP_BUILD_DATE || window.APP_BUILD_DATE.includes("BUILD_DATE")) return;
+      fetch('https://api.github.com/repos/jusephkanade/28channelvoiceapp/commits/master')
+        .then(r => r.json())
+        .then(data => {
+          const latestCommitDate = new Date(data.commit.committer.date).getTime();
+          const myBuildDate = new Date(window.APP_BUILD_DATE).getTime();
+          if (latestCommitDate > myBuildDate + 60000) {
+            this._showUpdateBanner();
+          }
+        })
+        .catch(() => {});
+    }
+
+    _showUpdateBanner() {
+      if (document.getElementById('vc-update-banner')) return;
+      const banner = document.createElement('div');
+      banner.id = 'vc-update-banner';
+      banner.className = 'fixed top-6 left-6 right-6 z-[999999] bg-gradient-to-r from-amber-500 to-orange-600 text-white p-5 rounded-3xl shadow-[0_20px_50px_rgba(245,158,11,0.5)] flex flex-col items-center justify-center gap-2 transform transition-all duration-700 -translate-y-full opacity-0';
+      banner.innerHTML = `
+        <div class="font-black text-xl tracking-tight flex items-center gap-2">
+          <svg class="w-6 h-6 animate-spin-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          ¡Actualización Disponible!
+        </div>
+        <div class="text-sm font-medium text-center opacity-90 mb-2">Hay nuevas mejoras para la app.</div>
+        <button id="vc-update-btn" class="bg-white text-orange-600 font-black px-8 py-3 rounded-full shadow-lg hover:scale-105 active:scale-95 transition-transform uppercase text-xs tracking-[0.2em] w-full max-w-[200px]">
+          Instalar Ahora
+        </button>
+      `;
+      document.body.appendChild(banner);
+
+      setTimeout(() => {
+        banner.classList.remove('-translate-y-full', 'opacity-0');
+      }, 1000);
+
+      document.getElementById('vc-update-btn').addEventListener('click', () => {
+        window.open('https://github.com/jusephkanade/28channelvoiceapp/releases/download/latest/app-release.apk', '_system');
+        banner.innerHTML = '<div class="font-black text-lg text-center">Descargando... ⏳<br><span class="text-xs font-normal opacity-80 mt-1 block">Abre el archivo descargado para actualizar.</span></div>';
+        setTimeout(() => {
+          banner.classList.add('-translate-y-full', 'opacity-0');
+          setTimeout(() => banner.remove(), 700);
+        }, 10000);
+      });
     }
 
     // ── CSS ────────────────────────────────────────────────────────────────

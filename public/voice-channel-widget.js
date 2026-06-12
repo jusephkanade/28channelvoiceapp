@@ -1588,6 +1588,10 @@
           this.connected = true;
           this._reconnects = 0;
           this.fab.classList.add('connected');
+          
+          if (!document.getElementById('vc-leave')) {
+            this._render(this._tplConnected());
+          }
 
           // Prevent duplicate timers/speakers
           if (!this._timerInt) this._startTimer();

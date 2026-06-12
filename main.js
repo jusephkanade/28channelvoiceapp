@@ -1,5 +1,52 @@
 // main.js - Entry point for the mobile app
-// We rely on the voice-channel-widget.js which exposes the class globally
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js';
+import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js';
+
+const firebaseConfig = {
+    apiKey: "AIzaSyDFkuktrXnsV9-jg2bv5dpJQRR-he8PT3g",
+    authDomain: "yairealvarado.firebaseapp.com",
+    databaseURL: "https://yaire-591ca-default-rtdb.firebaseio.com",
+    projectId: "yaire-591ca",
+    storageBucket: "yaire-591ca.firebasestorage.app",
+    messagingSenderId: "450381430658",
+    appId: "1:450381430658:web:262d1bb7b1732c3990d99b"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+// Intercept Google Login button clicks (using capture phase)
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('#vc-google-login-btn');
+  if (btn) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Cambiar el texto del botón a "Cargando..."
+    btn.innerHTML = '<div class="w-4 h-4 rounded-full border-2 border-white/20 border-t-white animate-spin"></div> Abriendo Google...';
+    btn.disabled = true;
+    
+    signInWithRedirect(auth, provider).catch(err => {
+      alert("Error al iniciar sesión: " + err.message);
+      btn.innerHTML = 'Continuar con Google';
+      btn.disabled = false;
+    });
+  }
+}, true);
+
+// Listen for Authentication state
+onAuthStateChanged(auth, (user) => {
+  window.yaireCurrentUser = user;
+  if (window.voiceWidget) {
+    window.voiceWidget.updateTranslations();
+  }
+});
+
+// Process any redirect results
+getRedirectResult(auth).catch(err => {
+  alert("Error post-login: " + err.message);
+});
 
 document.addEventListener('DOMContentLoaded', () => {
   // Add a slight delay to ensure the widget has attached to the DOM
@@ -15,15 +62,14 @@ document.addEventListener('DOMContentLoaded', () => {
         bar.style.display = 'none';
       }
       
-      // Remove close buttons or ver mas from the template since it's full screen
+      // Remove close buttons
       const closeBtn = document.getElementById('vc-close');
       if (closeBtn) closeBtn.style.display = 'none';
       
-      // Make sure the state thinks it's open so it renders properly
+      // Make sure the state thinks it's open
       if (window.voiceWidget) {
         window.voiceWidget.isOpen = true;
         
-        // Hide scrollbars but allow scrolling in chat
         const style = document.createElement('style');
         style.innerHTML = `
           ::-webkit-scrollbar { width: 0px; background: transparent; }

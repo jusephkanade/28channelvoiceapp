@@ -935,41 +935,6 @@
 
       this.panel.addEventListener('click', (e) => e.stopPropagation());
 
-      // SWIPE TO MINIMIZE
-      let _startY = 0;
-      let _isSwiping = false;
-      this.panel.addEventListener('touchstart', (e) => {
-        // Permitir deslizar hacia abajo desde cualquier parte, siempre y cuando
-        // no estemos tocando un contenedor scrolleable que ya tenga scroll hacia abajo.
-        let target = e.target;
-        let canScroll = false;
-        while(target && target !== this.panel) {
-           if (target.scrollHeight > target.clientHeight && target.scrollTop > 0) {
-              canScroll = true;
-              break;
-           }
-           target = target.parentNode;
-        }
-        if (!canScroll) {
-            _startY = e.touches[0].clientY;
-            _isSwiping = true;
-        } else {
-            _isSwiping = false;
-        }
-      }, { passive: true });
-      this.panel.addEventListener('touchmove', (e) => {
-        if (!_isSwiping) return;
-        const currentY = e.touches[0].clientY;
-        const deltaY = currentY - _startY;
-        
-        if (deltaY > 60) {
-            _isSwiping = false;
-            if (this.panel.classList.contains('scale-100')) {
-                this._toggle();
-            }
-        }
-      }, { passive: true });
-      this.panel.addEventListener('touchend', () => { _isSwiping = false; });
 
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
@@ -3385,12 +3350,11 @@
         const fs = window.Capacitor.Plugins.ForegroundService;
         let perm = await fs.checkPermissions();
         if (perm.display !== 'granted') {
-          perm = await fs.requestPermissions();
-          // [CRÍTICO]: En Android 14, si iniciamos un ForegroundService exactamente en el milisegundo 
-          // en el que se cierra el diálogo de permisos, Android piensa que la app está en "background" 
-          // (porque el diálogo acaba de quitarse) y crashea la app entera con ForegroundServiceStartNotAllowedException.
-          // Esperamos 500ms para asegurar que la Activity vuelva completamente a estar "Resumed" y en "Foreground".
-          await new Promise(resolve => setTimeout(resolve, 500));
+          // Solicitamos permiso pero ABORTAMOS el inicio del servicio
+          // para evitar ForegroundServiceStartNotAllowedException en Android 14.
+          // El servicio se iniciará correctamente la próxima vez que el usuario entre a la sala.
+          fs.requestPermissions().catch(()=>{});
+          return;
         }
         
         await fs.startForegroundService({

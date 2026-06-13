@@ -21,6 +21,7 @@
     "@capacitor/ios": "^8.4.0",
     "@capawesome-team/capacitor-android-foreground-service": "^8.1.0",
     "@capawesome-team/capacitor-file-opener": "^8.0.1",
-    "firebase": "^12.14.0"
+    "firebase": "^12.14.0",
+    "sharp": "^0.35.1"
   }
 }

@@ -666,9 +666,9 @@
       if (btnGoMain) {
         btnGoMain.addEventListener('click', () => {
           if (window.Capacitor && window.Capacitor.Plugins.Browser) {
-             window.Capacitor.Plugins.Browser.open({ url: 'https://charlygustav.github.io/28E/' });
+             window.Capacitor.Plugins.Browser.open({ url: 'https://yaire.vercel.app/' });
           } else {
-             window.open('https://charlygustav.github.io/28E/', '_system');
+             window.open('https://yaire.vercel.app/', '_system');
           }
         });
       }

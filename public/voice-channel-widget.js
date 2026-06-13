@@ -301,20 +301,28 @@
   .vc-light-theme .text-zinc-400 { color: #4b5563 !important; }
   .vc-light-theme .text-zinc-500 { color: #6b7280 !important; }
   .vc-light-theme .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important; }
-  /* Loading spinner, orbs, text */
+  /* Loading spinner & text */
+  .vc-light-theme .text-white\\/50 { color: rgba(17,24,39,0.6) !important; }
   .vc-light-theme .border-amber-500 { border-color: #d97706 !important; }
   .vc-light-theme .border-amber-500\\/20 { border-color: rgba(217,119,6,0.3) !important; }
+  .vc-light-theme .border-zinc-800 { border-color: #d1d5db !important; }
+  .vc-light-theme .bg-amber-500\\/30 { background-color: rgba(217,119,6,0.2) !important; }
+  /* Amber text & bg */
   .vc-light-theme .text-amber-500 { color: #b45309 !important; }
+  .vc-light-theme .text-amber-500\\/90 { color: rgba(180,83,9,0.95) !important; }
   .vc-light-theme .text-amber-500\\/80 { color: rgba(180,83,9,0.9) !important; }
   .vc-light-theme .text-amber-500\\/40 { color: rgba(180,83,9,0.6) !important; }
   .vc-light-theme .bg-amber-500\\/10 { background-color: rgba(217,119,6,0.12) !important; }
   .vc-light-theme .bg-amber-500\\/20 { background-color: rgba(217,119,6,0.15) !important; }
-  /* Make orbs visible but subtle on light */
-  .vc-light-theme .bg-amber-500\\/10.rounded-full.blur-\\[50px\\] { background-color: rgba(217,119,6,0.06) !important; }
+  .vc-light-theme .bg-amber-500 { background-color: #d97706 !important; }
+  /* History section */
+  .vc-light-theme .bg-zinc-900\\/30 { background-color: rgba(255,255,255,0.6) !important; }
+  /* Orbs */
   .vc-light-theme .bg-pink-500\\/10 { background-color: rgba(236,72,153,0.06) !important; }
+  .vc-light-theme .bg-pink-500\\/20 { background-color: rgba(236,72,153,0.08) !important; }
   /* Settings modal */
   .vc-light-theme #vc-settings-modal { background-color: #f5f5f5 !important; }
-  /* Red/purple accents legibility */
+  /* Red/purple/green accents */
   .vc-light-theme .text-red-500 { color: #dc2626 !important; }
   .vc-light-theme .bg-red-500\\/10 { background-color: rgba(220,38,38,0.1) !important; }
   .vc-light-theme .border-red-500\\/20 { border-color: rgba(220,38,38,0.2) !important; }
@@ -534,9 +542,9 @@
               </div>
             </div>
             <div class="flex gap-2" id="vc-theme-selector">
-              <button class="${btnClass('dark')}" data-theme="dark">🌙 Oscuro</button>
-              <button class="${btnClass('light')}" data-theme="light">☀️ Claro</button>
-              <button class="${btnClass('system')}" data-theme="system">📱 Sistema</button>
+              <button class="${btnClass('dark')}" data-theme="dark">Oscuro</button>
+              <button class="${btnClass('light')}" data-theme="light">Claro</button>
+              <button class="${btnClass('system')}" data-theme="system">Sistema</button>
             </div>
           </div>
 

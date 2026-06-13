@@ -3230,7 +3230,7 @@
           id: 28,
           title: '#principal',
           body: 'Llamada en progreso - 00:00',
-          smallIcon: 'push_icon',
+          smallIcon: 'ic_tulip_outline',
           buttons: [
             { id: 1, title: this.muted ? 'Activar Mic' : 'Silenciar' },
             { id: 2, title: this.dnd ? 'Quitar DND' : 'No Molestar' }
@@ -3249,7 +3249,7 @@
           id: 28,
           title: '#principal',
           body: `Llamada en progreso - ${str}`,
-          smallIcon: 'push_icon',
+          smallIcon: 'ic_tulip_outline',
           buttons: [
             { id: 1, title: this.muted ? 'Activar Mic' : 'Silenciar' },
             { id: 2, title: this.dnd ? 'Quitar DND' : 'No Molestar' }

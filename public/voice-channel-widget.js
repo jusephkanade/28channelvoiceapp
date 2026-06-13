@@ -597,18 +597,6 @@
               Buscar Actualizaciones
             </button>
           </div>
-          
-          <div class="text-xs text-white/40 font-bold uppercase tracking-widest mb-4">Cuenta & Enlaces</div>
-          <div class="bg-black/20 border border-white/10 rounded-2xl p-4 mb-6 flex flex-col gap-3">
-            <button id="vc-btn-go-main" class="w-full py-3 bg-[#4F46E5]/20 hover:bg-[#4F46E5]/40 text-[#818CF8] text-xs font-bold rounded-xl transition-colors border border-[#4F46E5]/30 flex items-center justify-center gap-2">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-              Ingresar a 28E Main
-            </button>
-            <button id="vc-btn-logout" class="w-full py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-bold rounded-xl transition-colors border border-red-500/20 flex items-center justify-center gap-2">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-              Cerrar Sesión
-            </button>
-          </div>
         </div>
       `;
       
@@ -660,29 +648,6 @@
             btnUpdate.textContent = "Error al conectar";
             setTimeout(() => btnUpdate.innerHTML = prevHtml, 3000);
           });
-      });
-
-      const btnGoMain = document.getElementById('vc-btn-go-main');
-      if (btnGoMain) {
-        btnGoMain.addEventListener('click', () => {
-          if (window.Capacitor && window.Capacitor.Plugins.Browser) {
-             window.Capacitor.Plugins.Browser.open({ url: 'https://yaire.vercel.app/' });
-          } else {
-             window.open('https://yaire.vercel.app/', '_system');
-          }
-        });
-      }
-
-      const btnLogout = document.getElementById('vc-btn-logout');
-      if (btnLogout) {
-        btnLogout.addEventListener('click', () => {
-          const conf = confirm('¿Estás seguro de que deseas cerrar sesión?');
-          if (conf && window.yaireSignOut) {
-             window.yaireSignOut();
-          }
-        });
-      }
-      
       
       requestAnimationFrame(() => modal.classList.add('opacity-100'));
     }
@@ -1034,9 +999,17 @@
           </div>
           <div class="px-5">
              <div class="text-xs opacity-80 text-white/30 font-bold uppercase tracking-[0.15em] mb-3">Opciones</div>
-             <button id="vc-sidebar-config-btn" class="w-full flex items-center gap-3 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors text-white font-medium text-sm">
+             <button id="vc-sidebar-config-btn" class="w-full flex items-center gap-3 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors text-white font-medium text-sm mb-2">
                 <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                 Configuración de la app
+             </button>
+             <button id="vc-sidebar-go-main" class="w-full flex items-center gap-3 px-4 py-3 bg-[#4F46E5]/10 hover:bg-[#4F46E5]/20 border border-[#4F46E5]/20 rounded-xl transition-colors text-[#818CF8] font-medium text-sm mb-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                Ingresar a 28E Main
+             </button>
+             <button id="vc-sidebar-logout" class="w-full flex items-center gap-3 px-4 py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-xl transition-colors text-red-400 font-medium text-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                Cerrar Sesión
              </button>
           </div>
         `;
@@ -1046,6 +1019,29 @@
              this._toggleSidebar();
              this._showSettings();
            };
+        }
+        
+        const btnGoMain = body.querySelector('#vc-sidebar-go-main');
+        if (btnGoMain) {
+          btnGoMain.onclick = () => {
+            this._toggleSidebar();
+            if (window.Capacitor && window.Capacitor.Plugins.Browser) {
+               window.Capacitor.Plugins.Browser.open({ url: 'https://yaire.vercel.app/' });
+            } else {
+               window.open('https://yaire.vercel.app/', '_system');
+            }
+          };
+        }
+
+        const btnLogout = body.querySelector('#vc-sidebar-logout');
+        if (btnLogout) {
+          btnLogout.onclick = () => {
+            this._toggleSidebar();
+            const conf = confirm('¿Estás seguro de que deseas cerrar sesión?');
+            if (conf && window.yaireSignOut) {
+               window.yaireSignOut();
+            }
+          };
         }
         
         // Re-bind ver mas inside sidebar

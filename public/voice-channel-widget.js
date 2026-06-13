@@ -744,7 +744,7 @@
 
     _initAudio() {
       try {
-        this.actx = new (window.AudioContext || window.webkitAudioContext)();
+        this.actx = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'interactive' });
         this.sfxBuf = {};
         this.sfxNodes = {};
         const load = async (k, u) => {
@@ -766,6 +766,8 @@
         load('music_start', 'sounds/lamusicadelvoz.wav');
         load('vc_chat_msg', 'sounds/nuevomensajeenelchatdevoz.wav');
         load('music_end_all', 'sounds/yanomasmusica.wav');
+        load('inicio', 'sounds/inicio.wav');
+        load('navegacion', 'sounds/navegacion.wav');
       } catch(e) {}
     }
 
@@ -780,10 +782,9 @@
         src.loop = loop;
         const gain = this.actx.createGain();
         
-        // Anti-pop fade in
+        // Sin latencia de fade in
         const t = this.actx.currentTime;
-        gain.gain.setValueAtTime(0, t);
-        gain.gain.linearRampToValueAtTime(vol, t + 0.02);
+        gain.gain.setValueAtTime(vol, t);
         
         src.connect(gain);
         gain.connect(this.actx.destination);
@@ -1453,7 +1454,10 @@
 
     _bindPanelEvents() {
       const btnVerMas = document.getElementById('vc-btn-ver-mas');
-      if (btnVerMas) btnVerMas.addEventListener('click', () => this._showDetailedHistory());
+      if (btnVerMas) btnVerMas.addEventListener('click', () => {
+        this._playSfx('navegacion', 0.4);
+        this._showDetailedHistory();
+      });
 
       const xBtn = document.getElementById('vc-close');
       if (xBtn) xBtn.addEventListener('click', () => this._toggle());
@@ -1734,6 +1738,7 @@
             this.connected = true;
             this._reconnects = 0;
             this.fab.classList.add('connected');
+            this._playSfx('inicio', 0.5);
             this._render(this._tplConnected());
 
             // Prevent duplicate timers/speakers

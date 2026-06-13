@@ -648,6 +648,7 @@
             btnUpdate.textContent = "Error al conectar";
             setTimeout(() => btnUpdate.innerHTML = prevHtml, 3000);
           });
+      });
       
       requestAnimationFrame(() => modal.classList.add('opacity-100'));
     }

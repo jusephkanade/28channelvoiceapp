@@ -3207,7 +3207,13 @@
     async _startForegroundService() {
       if (!window.Capacitor?.Plugins?.ForegroundService) return;
       try {
-        await window.Capacitor.Plugins.ForegroundService.startForegroundService({
+        const fs = window.Capacitor.Plugins.ForegroundService;
+        let perm = await fs.checkPermissions();
+        if (perm.display !== 'granted') {
+          perm = await fs.requestPermissions();
+        }
+        
+        await fs.startForegroundService({
           id: 28,
           title: '#principal',
           body: 'Llamada en progreso - 00:00',

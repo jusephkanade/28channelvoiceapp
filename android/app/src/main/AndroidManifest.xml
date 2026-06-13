@@ -28,6 +28,7 @@
             android:name="io.capawesome.capacitorjs.plugins.foregroundservice.AndroidForegroundService" 
             android:foregroundServiceType="microphone" 
             android:exported="false" />
+        <receiver android:name="io.capawesome.capacitorjs.plugins.foregroundservice.NotificationActionBroadcastReceiver" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

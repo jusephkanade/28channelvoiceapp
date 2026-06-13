@@ -530,8 +530,8 @@
       fetch('https://api.github.com/repos/jusephkanade/28channelvoiceapp/releases/latest')
         .then(r => r.json())
         .then(data => {
-          if (!data || !data.published_at) return;
-          const latestReleaseDate = new Date(data.published_at).getTime();
+          if (!data || !data.updated_at) return;
+          const latestReleaseDate = new Date(data.assets && data.assets.length > 0 ? data.assets[0].updated_at : data.updated_at).getTime();
           const myBuildDate = new Date(window.APP_BUILD_DATE).getTime();
           // Solo mostramos actualización si hay una versión *publicada* más reciente que nuestra compilación
           if (latestReleaseDate > myBuildDate + 60000) {
@@ -631,8 +631,8 @@
         fetch('https://api.github.com/repos/jusephkanade/28channelvoiceapp/releases/latest')
           .then(r => r.json())
           .then(data => {
-            if (!data || !data.published_at) { throw new Error("No release found"); }
-            const latestReleaseDate = new Date(data.published_at).getTime();
+            if (!data || !data.updated_at) { throw new Error("No release found"); }
+            const latestReleaseDate = new Date(data.assets && data.assets.length > 0 ? data.assets[0].updated_at : data.updated_at).getTime();
             const myBuildDate = window.APP_BUILD_DATE && !window.APP_BUILD_DATE.includes("BUILD_DATE") ? new Date(window.APP_BUILD_DATE).getTime() : 0;
             
             if (latestReleaseDate > myBuildDate + 60000) {

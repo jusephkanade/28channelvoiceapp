@@ -272,9 +272,13 @@
   .vc-marquee-container { display: flex; overflow: hidden; white-space: nowrap; mask-image: linear-gradient(to right, transparent, black 10px, black calc(100% - 10px), transparent); -webkit-mask-image: linear-gradient(to right, transparent, black 10px, black calc(100% - 10px), transparent); width: 100%; }
   .vc-marquee-content { flex-shrink: 0; animation: vc-marquee 12s linear infinite; padding-right: 2rem; }
   
-  body.vc-light-theme { background-color: #f3f4f6 !important; }
+  body.vc-light-theme { background-color: #f3f4f6 !important; color: #111827 !important; }
+  body.vc-light-theme #vc-panel { background-color: #f5f5f5 !important; }
+  body.vc-light-theme #app-container { background-color: #f3f4f6 !important; }
+  body.vc-light-theme .vc-glass { background: rgba(255, 255, 255, 0.85) !important; }
   .vc-light-theme .bg-zinc-950 { background-color: #f3f4f6 !important; }
   .vc-light-theme .bg-zinc-900 { background-color: #ffffff !important; }
+  .vc-light-theme .bg-zinc-900\\/50 { background-color: rgba(255,255,255,0.8) !important; }
   .vc-light-theme .text-white { color: #111827 !important; }
   .vc-light-theme .text-white\\/70 { color: rgba(17,24,39,0.7) !important; }
   .vc-light-theme .text-white\\/40 { color: rgba(17,24,39,0.5) !important; }
@@ -286,16 +290,17 @@
   .vc-light-theme .border-white\\/10 { border-color: rgba(0,0,0,0.1) !important; }
   .vc-light-theme .border-white\\/5 { border-color: rgba(0,0,0,0.05) !important; }
   .vc-light-theme .bg-black { background-color: #e5e7eb !important; color: #111827 !important; }
+  .vc-light-theme .bg-black\\/20 { background-color: rgba(0,0,0,0.03) !important; }
   .vc-light-theme .bg-black\\/40 { background-color: rgba(0,0,0,0.05) !important; }
-  .vc-light-theme .bg-black\\/60 { background-color: rgba(0,0,0,0.05) !important; }
+  .vc-light-theme .bg-black\\/60 { background-color: rgba(0,0,0,0.08) !important; }
   .vc-light-theme .bg-zinc-800 { background-color: #e5e7eb !important; color: #111827 !important; }
   .vc-light-theme .bg-zinc-700 { background-color: #d1d5db !important; color: #111827 !important; }
   .vc-light-theme .bg-zinc-600 { background-color: #9ca3af !important; }
   .vc-light-theme .border-zinc-800 { border-color: #d1d5db !important; }
+  .vc-light-theme .border-white\\/5 { border-color: rgba(0,0,0,0.05) !important; }
   .vc-light-theme .text-zinc-300 { color: #374151 !important; }
   .vc-light-theme .text-zinc-400 { color: #4b5563 !important; }
   .vc-light-theme .text-zinc-500 { color: #6b7280 !important; }
-  .vc-light-theme .bg-zinc-900\\/50 { background-color: rgba(255,255,255,0.8) !important; }
   .vc-light-theme .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important; }
   `;
 
@@ -1569,47 +1574,61 @@
         });
 
         this.socket.on('joined', async ({ userId, existingUsers }) => {
-          this._stopSfx(this.progNode); this.progNode = null;
-          this._playSfx('act_launch', 0.5);
+          try {
+            this._stopSfx(this.progNode); this.progNode = null;
+            this._playSfx('act_launch', 0.5);
 
-          // Clean up old peers from previous session (reconnect scenario)
-          this.peers.forEach((_, id) => this._closePeer(id));
-          this.peers.clear();
-          this.pendingIce.clear();
+            // Clean up old peers from previous session (reconnect scenario)
+            this.peers.forEach((_, id) => this._closePeer(id));
+            this.peers.clear();
+            this.pendingIce.clear();
 
-          // Re-acquire microphone if stream was lost
-          if (!this.stream || this.stream.getAudioTracks().every(t => t.readyState === 'ended')) {
-            try {
-              this.stream = await navigator.mediaDevices.getUserMedia({ audio: this._audioConstraints, video: false });
-              this._processedStream = this._createProcessedStream();
-              console.log('[VC] ✅ Microphone re-acquired with noise cancellation');
-            } catch(e) {
-              console.error('[VC] ❌ Could not re-acquire microphone:', e);
+            // ── CRITICAL: Set connected state and render UI FIRST (synchronously) ──
+            // Do NOT await anything before this block. On Android WebView,
+            // getUserMedia can hang indefinitely, blocking the entire handler.
+            this.myId = userId;
+            this.connected = true;
+            this._reconnects = 0;
+            this.fab.classList.add('connected');
+            this._render(this._tplConnected());
+
+            // Prevent duplicate timers/speakers
+            if (!this._timerInt) this._startTimer();
+            if (!this._analyser) this._setupSpeaking();
+            if (!this._wakeLock && !this._silentAudio) this._startKeepAlive();
+
+            // ── ASYNC: Re-acquire microphone if stream was lost ──
+            if (!this.stream || this.stream.getAudioTracks().every(t => t.readyState === 'ended')) {
+              try {
+                this.stream = await navigator.mediaDevices.getUserMedia({ audio: this._audioConstraints, video: false });
+                this._processedStream = this._createProcessedStream();
+                console.log('[VC] ✅ Microphone re-acquired with noise cancellation');
+              } catch(e) {
+                console.error('[VC] ❌ Could not re-acquire microphone:', e);
+              }
             }
-          }
 
-          this.myId = userId;
-          this.connected = true;
-          this._reconnects = 0;
-          this.fab.classList.add('connected');
-          
-          if (!document.getElementById('vc-leave')) {
+            // ── ASYNC: Create WebRTC offers to existing users ──
+            for (const u of existingUsers) {
+              try {
+                await this._createOffer(u.id);
+              } catch(e) {
+                console.error('[VC] ❌ Error creating offer for', u.id, e);
+              }
+            }
+
+            // Ring other users and clear invite state
+            this.socket.emit('ring_channel');
+            this._inviterName = null;
+            this._chatMsgs = [];
+            this._chatUnread = 0;
+            this.socket.emit('music_sync_request');
+          } catch(e) {
+            console.error('[VC] ❌ CRITICAL: joined handler error:', e);
+            // Force connected UI even if something above crashed
+            this.connected = true;
             this._render(this._tplConnected());
           }
-
-          // Prevent duplicate timers/speakers
-          if (!this._timerInt) this._startTimer();
-          if (!this._analyser) this._setupSpeaking();
-          if (!this._wakeLock && !this._silentAudio) this._startKeepAlive();
-
-          for (const u of existingUsers) await this._createOffer(u.id);
-
-          // Ring other users and clear invite state
-          this.socket.emit('ring_channel');
-          this._inviterName = null;
-          this._chatMsgs = [];
-          this._chatUnread = 0;
-          this.socket.emit('music_sync_request');
         });
 
         this.socket.on('channel_users', ({ users }) => {

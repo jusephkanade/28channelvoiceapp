@@ -473,6 +473,16 @@
       this._initTheme();
       this._buildUI();
       this._checkForUpdates();
+      this._setupForegroundServiceListener();
+    }
+
+    _setupForegroundServiceListener() {
+      if (window.Capacitor?.Plugins?.ForegroundService) {
+        window.Capacitor.Plugins.ForegroundService.addListener('buttonClicked', (event) => {
+          if (event.buttonId === 1) this._toggleMute();
+          if (event.buttonId === 2) this._toggleDND();
+        });
+      }
     }
 
     _initTheme() {
@@ -2052,6 +2062,10 @@
       }
       this._updateUsersDOM();
       this._playSfx(this.muted ? 'toggleOff' : 'toggleOn', 0.4);
+
+      const s = this._callStart ? Math.floor((Date.now() - this._callStart) / 1000) : 0;
+      const str = `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+      this._updateForegroundService(str);
     }
 
     _toggleDND() {
@@ -2074,6 +2088,10 @@
       }
       this._updateUsersDOM();
       this._playSfx(this.dnd ? 'toggleOff' : 'toggleOn', 0.4);
+
+      const s = this._callStart ? Math.floor((Date.now() - this._callStart) / 1000) : 0;
+      const str = `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+      this._updateForegroundService(str);
     }
 
     // ── LEAVE ─────────────────────────────────────────────────────────────
@@ -3154,6 +3172,7 @@
     // ── TIMER ────────────────────────────────────────────────────────────
     _startTimer() {
       this._callStart = Date.now();
+      this._startForegroundService();
       this._timerInt = setInterval(() => {
         const s = Math.floor((Date.now() - this._callStart) / 1000);
         const str = `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
@@ -3164,12 +3183,17 @@
         if (!this.panel.classList.contains('open') && this.connected) {
           this._bar.classList.add('show');
         }
+        // Update Foreground Service notification every minute
+        if (s > 0 && s % 60 === 0) {
+          this._updateForegroundService(str);
+        }
       }, 1000);
     }
 
     _stopTimer() {
       clearInterval(this._timerInt);
       this._timerInt = null;
+      this._stopForegroundService();
       if (this._callStart) {
         const dur = Math.floor((Date.now() - this._callStart) / 1000);
         if (window.yaireVcHistoryAdd) {

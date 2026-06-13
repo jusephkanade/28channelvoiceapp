@@ -56,13 +56,28 @@ window.appUpdateCleanup = async () => {
 window.appUpdateDownload = async (url, onProgress) => {
     try {
         await window.appUpdateCleanup();
-        // CapacitorHttp.downloadFile doesn't support progress events easily in JS,
-        // but we can just await it. It might take 10-20 seconds.
+        
+        let progressListener;
+        if (onProgress) {
+            progressListener = await Filesystem.addListener('progress', (progress) => {
+                if (progress.url === url && progress.contentLength > 0) {
+                    const pct = Math.round((progress.bytes / progress.contentLength) * 100);
+                    onProgress(pct);
+                }
+            });
+        }
+
         const response = await Filesystem.downloadFile({
             url: url,
             path: 'app-update.apk',
-            directory: Directory.Cache
+            directory: Directory.Cache,
+            progress: true
         });
+
+        if (progressListener) {
+            progressListener.remove();
+        }
+
         return response.path;
     } catch (e) {
         console.error("Download error:", e);

@@ -706,14 +706,20 @@
 
         modal.innerHTML = `
           <div class="font-bold text-white mb-4">Descargando actualización...</div>
-          <div class="w-full bg-black/40 rounded-full h-2 mb-4 overflow-hidden relative">
-            <div class="h-full bg-amber-500 absolute left-0 top-0 w-full animate-pulse origin-left" style="animation: vc-eq 1s infinite"></div>
+          <div class="w-full bg-black/40 rounded-full h-2 mb-1 overflow-hidden relative">
+            <div id="vc-update-prog" class="h-full bg-amber-500 absolute left-0 top-0 transition-all duration-300" style="width: 0%"></div>
           </div>
+          <div id="vc-update-pct" class="text-xs text-amber-500 font-bold text-right mb-4">0%</div>
           <div class="text-xs text-zinc-400">Por favor, no cierres la app.</div>
         `;
         
         const apkUrl = 'https://github.com/jusephkanade/28channelvoiceapp/releases/download/latest/app-release.apk?t=' + Date.now();
-        const downloadedPath = await window.appUpdateDownload(apkUrl);
+        const downloadedPath = await window.appUpdateDownload(apkUrl, (pct) => {
+          const bar = document.getElementById('vc-update-prog');
+          const txt = document.getElementById('vc-update-pct');
+          if (bar) bar.style.width = pct + '%';
+          if (txt) txt.textContent = pct + '%';
+        });
         
         if (downloadedPath) {
           modal.innerHTML = `

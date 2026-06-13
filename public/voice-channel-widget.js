@@ -533,8 +533,9 @@
           if (!data || !data.updated_at) return;
           const latestReleaseDate = new Date(data.assets && data.assets.length > 0 ? data.assets[0].updated_at : data.updated_at).getTime();
           const myBuildDate = new Date(window.APP_BUILD_DATE).getTime();
-          // Solo mostramos actualización si hay una versión *publicada* más reciente que nuestra compilación
-          if (latestReleaseDate > myBuildDate + 60000) {
+          // Aumentamos la tolerancia a 10 minutos (600000 ms) porque compilar el APK tarda unos 3-5 minutos.
+          // Así evitamos que la fecha de subida del APK siempre sea "más nueva" que la fecha de inyección del código.
+          if (latestReleaseDate > myBuildDate + 600000) {
             this._showUpdateBanner();
           }
         })
@@ -635,7 +636,7 @@
             const latestReleaseDate = new Date(data.assets && data.assets.length > 0 ? data.assets[0].updated_at : data.updated_at).getTime();
             const myBuildDate = window.APP_BUILD_DATE && !window.APP_BUILD_DATE.includes("BUILD_DATE") ? new Date(window.APP_BUILD_DATE).getTime() : 0;
             
-            if (latestReleaseDate > myBuildDate + 60000) {
+            if (latestReleaseDate > myBuildDate + 600000) {
               this._showUpdateBanner();
               btnUpdate.innerHTML = prevHtml;
             } else {

@@ -282,26 +282,48 @@
   .vc-light-theme .text-white { color: #111827 !important; }
   .vc-light-theme .text-white\\/70 { color: rgba(17,24,39,0.7) !important; }
   .vc-light-theme .text-white\\/40 { color: rgba(17,24,39,0.5) !important; }
-  .vc-light-theme .text-white\\/30 { color: rgba(17,24,39,0.5) !important; }
-  .vc-light-theme .text-white\\/20 { color: rgba(17,24,39,0.5) !important; }
+  .vc-light-theme .text-white\\/30 { color: rgba(17,24,39,0.4) !important; }
+  .vc-light-theme .text-white\\/20 { color: rgba(17,24,39,0.35) !important; }
   .vc-light-theme .bg-white\\/5 { background-color: rgba(0,0,0,0.05) !important; }
-  .vc-light-theme .bg-white\\/10 { background-color: rgba(0,0,0,0.1) !important; }
-  .vc-light-theme .bg-white\\/20 { background-color: rgba(0,0,0,0.2) !important; }
+  .vc-light-theme .bg-white\\/10 { background-color: rgba(0,0,0,0.08) !important; }
+  .vc-light-theme .bg-white\\/20 { background-color: rgba(0,0,0,0.12) !important; }
   .vc-light-theme .border-white\\/10 { border-color: rgba(0,0,0,0.1) !important; }
-  .vc-light-theme .border-white\\/5 { border-color: rgba(0,0,0,0.05) !important; }
+  .vc-light-theme .border-white\\/5 { border-color: rgba(0,0,0,0.08) !important; }
   .vc-light-theme .bg-black { background-color: #e5e7eb !important; color: #111827 !important; }
-  .vc-light-theme .bg-black\\/20 { background-color: rgba(0,0,0,0.03) !important; }
-  .vc-light-theme .bg-black\\/40 { background-color: rgba(0,0,0,0.05) !important; }
+  .vc-light-theme .bg-black\\/20 { background-color: rgba(0,0,0,0.04) !important; }
+  .vc-light-theme .bg-black\\/40 { background-color: rgba(0,0,0,0.06) !important; }
   .vc-light-theme .bg-black\\/60 { background-color: rgba(0,0,0,0.08) !important; }
   .vc-light-theme .bg-zinc-800 { background-color: #e5e7eb !important; color: #111827 !important; }
   .vc-light-theme .bg-zinc-700 { background-color: #d1d5db !important; color: #111827 !important; }
   .vc-light-theme .bg-zinc-600 { background-color: #9ca3af !important; }
   .vc-light-theme .border-zinc-800 { border-color: #d1d5db !important; }
-  .vc-light-theme .border-white\\/5 { border-color: rgba(0,0,0,0.05) !important; }
   .vc-light-theme .text-zinc-300 { color: #374151 !important; }
   .vc-light-theme .text-zinc-400 { color: #4b5563 !important; }
   .vc-light-theme .text-zinc-500 { color: #6b7280 !important; }
   .vc-light-theme .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important; }
+  /* Loading spinner, orbs, text */
+  .vc-light-theme .border-amber-500 { border-color: #d97706 !important; }
+  .vc-light-theme .border-amber-500\\/20 { border-color: rgba(217,119,6,0.3) !important; }
+  .vc-light-theme .text-amber-500 { color: #b45309 !important; }
+  .vc-light-theme .text-amber-500\\/80 { color: rgba(180,83,9,0.9) !important; }
+  .vc-light-theme .text-amber-500\\/40 { color: rgba(180,83,9,0.6) !important; }
+  .vc-light-theme .bg-amber-500\\/10 { background-color: rgba(217,119,6,0.12) !important; }
+  .vc-light-theme .bg-amber-500\\/20 { background-color: rgba(217,119,6,0.15) !important; }
+  /* Make orbs visible but subtle on light */
+  .vc-light-theme .bg-amber-500\\/10.rounded-full.blur-\\[50px\\] { background-color: rgba(217,119,6,0.06) !important; }
+  .vc-light-theme .bg-pink-500\\/10 { background-color: rgba(236,72,153,0.06) !important; }
+  /* Settings modal */
+  .vc-light-theme #vc-settings-modal { background-color: #f5f5f5 !important; }
+  /* Red/purple accents legibility */
+  .vc-light-theme .text-red-500 { color: #dc2626 !important; }
+  .vc-light-theme .bg-red-500\\/10 { background-color: rgba(220,38,38,0.1) !important; }
+  .vc-light-theme .border-red-500\\/20 { border-color: rgba(220,38,38,0.2) !important; }
+  .vc-light-theme .border-red-500\\/30 { border-color: rgba(220,38,38,0.3) !important; }
+  .vc-light-theme .text-purple-400 { color: #7c3aed !important; }
+  .vc-light-theme .bg-purple-500\\/10 { background-color: rgba(124,58,237,0.1) !important; }
+  .vc-light-theme .border-purple-500\\/30 { border-color: rgba(124,58,237,0.3) !important; }
+  .vc-light-theme .text-green-500 { color: #16a34a !important; }
+  .vc-light-theme .bg-green-500 { background-color: #16a34a !important; }
   `;
 
   // ── ICONS ─────────────────────────────────────────────────────────────────
@@ -431,8 +453,38 @@
       };
 
       this._injectCSS();
+      this._initTheme();
       this._buildUI();
       this._checkForUpdates();
+    }
+
+    _initTheme() {
+      const saved = localStorage.getItem('28e_vc_theme') || 'dark';
+      window.vcThemeMode = saved; // 'dark', 'light', or 'system'
+      this._applyTheme();
+      // Listen for system theme changes
+      if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+          if (window.vcThemeMode === 'system') this._applyTheme();
+        });
+      }
+    }
+
+    _applyTheme() {
+      const mode = window.vcThemeMode || 'dark';
+      if (mode === 'light' || (mode === 'system' && window.matchMedia && !window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.body.classList.add('vc-light-theme');
+        window.vcLightMode = true;
+      } else {
+        document.body.classList.remove('vc-light-theme');
+        window.vcLightMode = false;
+      }
+    }
+
+    _setTheme(mode) {
+      window.vcThemeMode = mode;
+      localStorage.setItem('28e_vc_theme', mode);
+      this._applyTheme();
     }
 
     _checkForUpdates() {
@@ -455,6 +507,11 @@
       modal.id = 'vc-settings-modal';
       modal.className = 'absolute inset-0 z-[99999] bg-zinc-950 flex flex-col transition-opacity duration-300 opacity-0';
       
+      const currentTheme = window.vcThemeMode || 'dark';
+      const btnClass = (mode) => mode === currentTheme
+        ? 'flex-1 py-2.5 rounded-xl text-xs font-bold bg-amber-500 text-black transition-all shadow-md'
+        : 'flex-1 py-2.5 rounded-xl text-xs font-bold bg-white/5 text-white/70 border border-white/10 hover:bg-white/10 transition-all';
+      
       modal.innerHTML = `
         <div class="flex items-center gap-3 px-5 py-4 bg-zinc-900/50 border-b border-white/5">
           <button class="w-10 h-10 rounded-xl bg-white/5 text-white/70 flex items-center justify-center hover:bg-white/10 transition-colors" id="vc-settings-back">
@@ -464,21 +521,23 @@
         </div>
         
         <div class="flex-1 overflow-y-auto px-5 py-4 vc-scroll">
-          <div class="text-xs text-white/40 font-bold uppercase tracking-widest mb-4">Ajustes de Interfaz</div>
+          <div class="text-xs text-white/40 font-bold uppercase tracking-widest mb-4">Apariencia</div>
           
-          <div class="bg-black/20 border border-white/10 rounded-2xl p-4 flex items-center justify-between mb-6">
-            <div class="flex items-center gap-3">
+          <div class="bg-black/20 border border-white/10 rounded-2xl p-4 mb-6">
+            <div class="flex items-center gap-3 mb-4">
               <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/70">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
               </div>
               <div>
-                <div class="text-white text-sm font-bold">Tema Oscuro</div>
-                <div class="text-white/40 text-[10px]">Ajusta los colores de la sala</div>
+                <div class="text-white text-sm font-bold">Tema</div>
+                <div class="text-white/40 text-[10px]">Elige el aspecto de la aplicación</div>
               </div>
             </div>
-            <button id="vc-btn-theme-modal" class="w-12 h-6 rounded-full transition-colors relative ${window.vcLightMode ? 'bg-zinc-600' : 'bg-amber-500'}">
-              <div id="vc-btn-theme-thumb" class="w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${window.vcLightMode ? 'left-0.5 translate-x-0' : 'left-0.5 translate-x-6'} shadow-sm"></div>
-            </button>
+            <div class="flex gap-2" id="vc-theme-selector">
+              <button class="${btnClass('dark')}" data-theme="dark">🌙 Oscuro</button>
+              <button class="${btnClass('light')}" data-theme="light">☀️ Claro</button>
+              <button class="${btnClass('system')}" data-theme="system">📱 Sistema</button>
+            </div>
           </div>
 
           <div class="text-xs text-white/40 font-bold uppercase tracking-widest mb-4">Sistema</div>
@@ -507,19 +566,21 @@
         setTimeout(() => modal.remove(), 300);
       });
       
-      const btnTheme = document.getElementById('vc-btn-theme-modal');
-      const btnThumb = document.getElementById('vc-btn-theme-thumb');
-      btnTheme.addEventListener('click', () => {
-        window.vcLightMode = !window.vcLightMode;
-        if (window.vcLightMode) {
-          document.body.classList.add('vc-light-theme');
-          btnTheme.className = 'w-12 h-6 rounded-full transition-colors relative bg-zinc-600';
-          btnThumb.className = 'w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform left-0.5 translate-x-0 shadow-sm';
-        } else {
-          document.body.classList.remove('vc-light-theme');
-          btnTheme.className = 'w-12 h-6 rounded-full transition-colors relative bg-amber-500';
-          btnThumb.className = 'w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform left-0.5 translate-x-6 shadow-sm';
-        }
+      // Theme selector buttons
+      const themeSelector = document.getElementById('vc-theme-selector');
+      themeSelector.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const mode = btn.dataset.theme;
+          this._setTheme(mode);
+          // Update button styles
+          themeSelector.querySelectorAll('button').forEach(b => {
+            if (b.dataset.theme === mode) {
+              b.className = 'flex-1 py-2.5 rounded-xl text-xs font-bold bg-amber-500 text-black transition-all shadow-md';
+            } else {
+              b.className = 'flex-1 py-2.5 rounded-xl text-xs font-bold bg-white/5 text-white/70 border border-white/10 hover:bg-white/10 transition-all';
+            }
+          });
+        });
       });
       
       const btnUpdate = document.getElementById('vc-btn-check-update-modal');

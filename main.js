@@ -145,8 +145,10 @@ onAuthStateChanged(auth, async (user) => {
   // Hide the initial loader now that the app is ready
   const loader = document.getElementById('initial-loader');
   if (loader) {
+    loader.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
     loader.style.opacity = '0';
-    setTimeout(() => loader.remove(), 500);
+    loader.style.transform = 'scale(1.06)';
+    setTimeout(() => loader.remove(), 650);
   }
 
   if (window.voiceWidget) {

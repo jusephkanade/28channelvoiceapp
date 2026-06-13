@@ -787,6 +787,14 @@
             await load(k, u);
           }
         };
+        // Oscillator silencioso para mantener el hardware de audio despierto (elimina latencia en móviles)
+        const wakeOsc = this.actx.createOscillator();
+        const wakeGain = this.actx.createGain();
+        wakeGain.gain.value = 0.0001; // inaudible
+        wakeOsc.connect(wakeGain);
+        wakeGain.connect(this.actx.destination);
+        wakeOsc.start();
+
         initSounds();
       } catch(e) {}
     }
@@ -860,8 +868,28 @@
 
       this.panel = document.createElement('div');
       this.panel.id = 'vc-panel';
-      this.panel.className = 'fixed bottom-24 right-6 w-full max-w-[315px] bg-zinc-950/85 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.8)] overflow-hidden z-[9998] transition-all duration-300 transform scale-95 opacity-0 pointer-events-none translate-y-4 font-sans';
+      this.panel.className = 'fixed bottom-4 right-4 z-[9998] w-[350px] max-w-[calc(100vw-32px)] bg-zinc-950/95 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col transition-all duration-[400ms] cubic-bezier(0.34, 1.56, 0.64, 1) transform scale-95 opacity-0 translate-y-10 pointer-events-none origin-bottom-right h-[550px] max-h-[calc(100vh-120px)]';
       this.panel.innerHTML = this._tplLogin();
+
+      this.sidebar = document.createElement('div');
+      this.sidebar.id = 'vc-sidebar';
+      this.sidebar.className = 'fixed inset-0 z-[10002] bg-black/80 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300 flex justify-end';
+      this.sidebar.innerHTML = `
+        <div class="w-80 max-w-[80vw] h-full bg-zinc-950 border-l border-white/10 shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col" id="vc-sidebar-panel">
+            <div class="px-5 py-4 border-b border-white/10 flex items-center justify-between bg-zinc-900/50">
+                <div class="flex items-center gap-2 text-amber-500">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    <span class="font-bold tracking-widest uppercase text-sm">Menú</span>
+                </div>
+                <button id="vc-sidebar-close" class="text-white/50 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg p-1.5 transition-colors">✕</button>
+            </div>
+            <div class="flex-1 overflow-y-auto" id="vc-sidebar-body">
+            </div>
+        </div>
+      `;
+      this.sidebar.querySelector('#vc-sidebar-close').onclick = () => this._toggleSidebar();
+      this.sidebar.onclick = (e) => { if(e.target === this.sidebar) this._toggleSidebar(); };
+      this._sidebarOpen = false;
 
       this._bar = document.createElement('div');
       this._bar.id = 'vc-bar';
@@ -900,6 +928,7 @@
 
       document.body.appendChild(this.fab);
       document.body.appendChild(this.panel);
+      document.body.appendChild(this.sidebar);
       document.body.appendChild(this._bar);
 
       this.panel.addEventListener('click', (e) => e.stopPropagation());
@@ -910,6 +939,10 @@
           if (detHist) {
             const btn = document.getElementById('vc-det-close');
             if (btn) btn.click();
+            return;
+          }
+          if (this._sidebarOpen) {
+            this._toggleSidebar();
             return;
           }
           if (this.panel.classList.contains('scale-100')) {
@@ -924,7 +957,7 @@
 
       document.addEventListener('click', (e) => {
         if (!this.panel.classList.contains('scale-100')) return;
-        if (this.panel.contains(e.target) || this.fab.contains(e.target)) return;
+        if (this.panel.contains(e.target) || this.fab.contains(e.target) || this.sidebar.contains(e.target)) return;
         if (_panelMousedown) return;
         if (window.getSelection && window.getSelection().toString()) return;
         if (document.getElementById('vc-detailed-history')) return;
@@ -954,11 +987,47 @@
       this._bindPanelEvents();
     }
 
+    _toggleSidebar() {
+      this._sidebarOpen = !this._sidebarOpen;
+      if (this._sidebarOpen) {
+        const body = this.sidebar.querySelector('#vc-sidebar-body');
+        body.innerHTML = `
+          <div class="mb-6">
+             ${this._tplHistory()}
+          </div>
+          <div class="px-5">
+             <div class="text-xs opacity-80 text-white/30 font-bold uppercase tracking-[0.15em] mb-3">Opciones</div>
+             <button id="vc-sidebar-config-btn" class="w-full flex items-center gap-3 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors text-white font-medium text-sm">
+                <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                Configuración de la app
+             </button>
+          </div>
+        `;
+        const cfgBtn = body.querySelector('#vc-sidebar-config-btn');
+        if (cfgBtn) {
+           cfgBtn.onclick = () => {
+             this._toggleSidebar();
+             this._showConfig();
+           };
+        }
+        
+        // Re-bind ver mas inside sidebar
+        const verMas = document.getElementById('vc-btn-ver-mas');
+        if(verMas) verMas.onclick = () => { this._toggleSidebar(); this._showHistoryModal(); };
+
+        this.sidebar.classList.remove('opacity-0', 'pointer-events-none');
+        this.sidebar.querySelector('#vc-sidebar-panel').classList.remove('translate-x-full');
+      } else {
+        this.sidebar.classList.add('opacity-0', 'pointer-events-none');
+        this.sidebar.querySelector('#vc-sidebar-panel').classList.add('translate-x-full');
+      }
+    }
+
     _toggle() {
       const willOpen = !this.panel.classList.contains('scale-100');
       
       if (willOpen) {
-        this.panel.classList.remove('scale-95', 'opacity-0', 'pointer-events-none', 'translate-y-4');
+        this.panel.classList.remove('scale-95', 'opacity-0', 'pointer-events-none', 'translate-y-10');
         this.panel.classList.add('scale-100', 'opacity-100', 'pointer-events-auto', 'translate-y-0');
         if (this.connected) {
           this._bar.classList.remove('opacity-100', 'pointer-events-auto', 'translate-y-0');
@@ -972,7 +1041,7 @@
       } else {
         if (this._loginPollInt) { clearInterval(this._loginPollInt); this._loginPollInt = null; }
         this.panel.classList.remove('scale-100', 'opacity-100', 'pointer-events-auto', 'translate-y-0');
-        this.panel.classList.add('scale-95', 'opacity-0', 'pointer-events-none', 'translate-y-4');
+        this.panel.classList.add('scale-95', 'opacity-0', 'pointer-events-none', 'translate-y-10');
         if (this.connected) {
           this._bar.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
           this._bar.classList.add('opacity-100', 'pointer-events-auto', 'translate-y-0');
@@ -997,8 +1066,8 @@
                 <div><div class="text-white font-bold text-base">#principal</div><div class="text-white/40 text-xs">${_t('vc_sub')}</div></div>
               </div>
               <div class="flex items-center gap-1">
-                <button class="text-white/30 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors" id="vc-tab-config" title="Configuración">
-                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <button class="text-white/30 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors" id="vc-btn-menu" title="Menú">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
                 <button class="text-white/30 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors" id="vc-close">✕</button>
               </div>
@@ -1034,8 +1103,8 @@
               <div><div class="text-white font-bold text-base">#principal</div><div class="text-white/40 text-xs">${_t('vc_sub')}</div></div>
             </div>
             <div class="flex items-center gap-1">
-              <button class="text-white/30 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors" id="vc-tab-config" title="Configuración">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+              <button class="text-white/30 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors" id="vc-btn-menu" title="Menú">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
               </button>
               <button class="text-white/30 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors" id="vc-close">✕</button>
             </div>
@@ -1062,7 +1131,7 @@
                 <div class="text-red-400 text-xs text-center font-medium empty:hidden" id="vc-err">${err}</div>
             </div>
           </div>
-          ${this._tplHistory()}
+          </div>
         </div>`;
     }
 
@@ -1078,8 +1147,8 @@
               <div><div class="text-white font-bold text-sm">#principal</div><div class="text-white/40 text-sm opacity-90">${_t('st_conn')}</div></div>
             </div>
             <div class="flex items-center gap-1">
-              <button class="text-white/30 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors" id="vc-tab-config" title="Configuración">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+              <button class="text-white/30 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors" id="vc-btn-menu" title="Menú">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
               </button>
               <button class="text-white/30 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors" id="vc-close">✕</button>
             </div>
@@ -1107,8 +1176,8 @@
               <div><div class="text-white font-bold text-sm">#principal</div><div class="text-red-400 font-bold text-sm opacity-90 uppercase tracking-wider">${_t('st_disc')}</div></div>
             </div>
             <div class="flex items-center gap-1">
-              <button class="text-white/30 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors" id="vc-tab-config" title="Configuración">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+              <button class="text-white/30 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors" id="vc-btn-menu" title="Menú">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
               </button>
               <button class="text-white/30 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors" id="vc-close">✕</button>
             </div>
@@ -1241,8 +1310,8 @@
             </div>
           </div>
           <div class="flex items-center gap-1">
-            <button class="text-white/30 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors" id="vc-tab-config" title="Configuración">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            <button class="text-white/30 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors" id="vc-btn-menu" title="Menú">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
             <button class="text-white/30 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors" id="vc-close">✕</button>
           </div>
@@ -1469,6 +1538,8 @@
       this.panel.innerHTML = tpl;
       this._bindPanelEvents();
       
+      const btnMenu = document.getElementById('vc-btn-menu');
+      if (btnMenu) btnMenu.onclick = () => this._toggleSidebar(); 
       if (document.getElementById('vc-join')) {
         const updateConnCount = () => {
           fetch(SIGNALING_URL + '/health').then(r => r.json()).then(data => {
@@ -3213,15 +3284,22 @@
 
     _playNotif(type) {
       try {
-        const ctx  = new (window.AudioContext || window.webkitAudioContext)();
+        if (!this.actx) return;
+        const ctx = this.actx;
+        // Si estaba dormido, lo despertamos rápido para evitar latencia
+        if (ctx.state === 'suspended') ctx.resume();
+
         const osc  = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.connect(gain); gain.connect(ctx.destination);
-        osc.frequency.setValueAtTime(type === 'join' ? 880 : 440, ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(type === 'join' ? 1320 : 220, ctx.currentTime + 0.15);
-        gain.gain.setValueAtTime(0.12, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
-        osc.start(); osc.stop(ctx.currentTime + 0.3);
+        
+        const t = ctx.currentTime;
+        osc.frequency.setValueAtTime(type === 'join' ? 880 : 440, t);
+        osc.frequency.exponentialRampToValueAtTime(type === 'join' ? 1320 : 220, t + 0.15);
+        gain.gain.setValueAtTime(0.12, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+        
+        osc.start(t); osc.stop(t + 0.3);
       } catch(e) {}
     }
 

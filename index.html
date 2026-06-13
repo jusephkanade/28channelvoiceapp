@@ -8,7 +8,7 @@
   <style>
     /* Aumentar escala base global para móviles (Tailwind rem scaling) */
     html {
-      font-size: 18px; /* Base por defecto es 16px. 18px = 12.5% más grande */
+      font-size: 17px; /* Base por defecto es 16px. 17px = ~6% más grande */
     }
 
     /* Prevent text selection and pull-to-refresh on mobile */
@@ -85,16 +85,109 @@
     <div id="vc-root" class="w-full h-full">
       <!-- The voice channel widget UI will be injected here by main.js -->
     </div>
-    <!-- Initial Loader -->
-    <div id="initial-loader" class="fixed inset-0 z-[100000] bg-[#09090b] flex flex-col items-center justify-center transition-opacity duration-500">
-      <div class="relative w-16 h-16 mb-4">
-        <div class="absolute inset-0 rounded-full border-[3px] border-amber-500/20"></div>
-        <div class="absolute inset-0 rounded-full border-[3px] border-amber-500 border-t-transparent animate-spin"></div>
-        <div class="absolute inset-0 flex items-center justify-center text-amber-500">
-          <svg class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
+    <!-- ═══ LOADER ORIGINAL DE 28E MAIN ═══ -->
+    <div id="initial-loader"
+        style="position:fixed;inset:0;z-index:200000;background:#050505;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;will-change:transform,opacity;">
+
+        <!-- Ambient glow -->
+        <div class="loader-glow loader-glow-1"></div>
+        <div class="loader-glow loader-glow-2"></div>
+
+        <!-- Logo -->
+        <div id="loader-logo"
+            style="position:relative;z-index:10;opacity:0;margin-bottom:2rem;text-align:center;animation:ldFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.15s forwards;">
+            <span
+                style="font-family:sans-serif;font-weight:900;font-size:2.6rem;letter-spacing:-0.06em;color:#fff;line-height:1;">28E</span>
         </div>
-      </div>
-      <div class="text-amber-500/80 text-xs font-bold tracking-widest uppercase animate-pulse">Iniciando... ✨</div>
+
+        <!-- Sphere + Progress Ring -->
+        <div id="custom-loader-wrapper"
+            style="position:relative;z-index:10;display:flex;align-items:center;justify-content:center;width:220px;height:220px;opacity:0;animation:ldScaleIn 0.8s cubic-bezier(0.22,1,0.36,1) 0.3s forwards;">
+
+            <!-- SVG Progress Ring -->
+            <svg width="220" height="220" viewBox="0 0 220 220" style="position:absolute;inset:0;z-index:2;">
+                <circle cx="110" cy="110" r="104" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1" />
+                <circle id="loader-ring-fill" cx="110" cy="110" r="104" fill="none" stroke="url(#ld-ring-grad)"
+                    stroke-width="1.5" stroke-linecap="round" stroke-dasharray="653.45" stroke-dashoffset="653.45"
+                    transform="rotate(-90 110 110)"
+                    style="transition:stroke-dashoffset 0.5s cubic-bezier(0.4,0,0.2,1);" />
+                <defs>
+                    <linearGradient id="ld-ring-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.7" />
+                        <stop offset="100%" stop-color="#ec4899" stop-opacity="0.7" />
+                    </linearGradient>
+                </defs>
+            </svg>
+
+            <!-- The Sphere -->
+            <div style="position:relative;width:180px;height:180px;border-radius:50%;user-select:none;">
+                <div class="loader-circle-bg"></div>
+            </div>
+
+            <!-- Sphere shadow (ground reflection) -->
+            <div
+                style="position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:100px;height:14px;background:radial-gradient(ellipse,rgba(236,72,153,0.12) 0%,transparent 70%);border-radius:50%;pointer-events:none;z-index:0;">
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div id="loader-footer"
+            style="position:absolute;bottom:2rem;left:0;right:0;z-index:15;text-align:center;opacity:0;animation:ldFadeIn 0.4s ease 0.7s forwards;color:rgba(255,255,255,0.3);font-family:sans-serif;font-size:0.65rem;letter-spacing:0.05em;font-weight:300;pointer-events:none;">
+            Conectando universo... ✨
+        </div>
+
+        <style>
+            .loader-glow { position: absolute; border-radius: 50%; filter: blur(60px); pointer-events: none; opacity: 0.6; }
+            .loader-glow-1 { top: -20%; left: -20%; width: 60%; height: 60%; background: radial-gradient(circle, #f59e0b, transparent 70%); animation: ldPulse 6s infinite alternate ease-in-out; }
+            .loader-glow-2 { bottom: -20%; right: -20%; width: 60%; height: 60%; background: radial-gradient(circle, #ec4899, transparent 70%); animation: ldPulse 8s infinite alternate-reverse ease-in-out; }
+            
+            @keyframes ldPulse { 0% { transform: scale(0.8); opacity: 0.4; } 100% { transform: scale(1.2); opacity: 0.8; } }
+
+            .loader-circle-bg {
+                position: absolute;
+                inset: 0;
+                border-radius: 50%;
+                background-color: transparent;
+                animation: loader-rotate 2.5s linear infinite;
+            }
+
+            @keyframes loader-rotate {
+                0% {
+                    transform: rotate(90deg);
+                    box-shadow:
+                        0 10px 20px 0 #fff inset,
+                        0 20px 30px 0 #f59e0b inset,
+                        0 60px 60px 0 #ec4899 inset;
+                }
+                50% {
+                    transform: rotate(270deg);
+                    box-shadow:
+                        0 10px 20px 0 #fff inset,
+                        0 20px 10px 0 #ec4899 inset,
+                        0 40px 60px 0 #d97706 inset;
+                }
+                100% {
+                    transform: rotate(450deg);
+                    box-shadow:
+                        0 10px 20px 0 #fff inset,
+                        0 20px 30px 0 #f59e0b inset,
+                        0 60px 60px 0 #ec4899 inset;
+                }
+            }
+            
+            @keyframes ldFadeUp {
+                from { opacity: 0; transform: translateY(15px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            @keyframes ldScaleIn {
+                from { opacity: 0; transform: scale(0.9); }
+                to { opacity: 1; transform: scale(1); }
+            }
+            @keyframes ldFadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+        </style>
     </div>
   </div>
   

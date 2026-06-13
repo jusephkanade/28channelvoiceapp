@@ -10,4 +10,13 @@ public class MainActivity extends BridgeActivity {
         super.onCreate(savedInstanceState);
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        // Evita que Android pause la reproducción de YouTube al minimizar la app
+        if (this.bridge != null && this.bridge.getWebView() != null) {
+            this.bridge.getWebView().onResume();
+        }
+    }
 }

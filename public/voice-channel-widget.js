@@ -747,60 +747,90 @@
         this.actx = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'interactive' });
         this.sfxBuf = {};
         this.sfxNodes = {};
+        
+        // Decodificar audios bloquea el hilo principal en WebView. 
+        // Si lo hacemos todo en paralelo, la app se congela y la UI tiene lag masivo.
+        // Cargar y decodificar secuencialmente soluciona el lag de la interfaz.
         const load = async (k, u) => {
           try {
             const r = await fetch(u);
-            this.sfxBuf[k] = await this.actx.decodeAudioData(await r.arrayBuffer());
+            const buf = await r.arrayBuffer();
+            this.sfxBuf[k] = await this.actx.decodeAudioData(buf);
           } catch(e){}
         };
-        load('flyin', 'sounds/flyin.wav');
-        load('flyout', 'sounds/flyout.wav');
-        load('typing', 'sounds/typing.wav');
-        load('progress', 'SND01_sine/progress_loop.wav');
-        load('toggleOn', 'SND01_sine/toggle_on.wav');
-        load('toggleOff', 'SND01_sine/toggle_off.wav');
-        load('act_launch', 'sounds/activity_launch.mp3');
-        load('act_end', 'sounds/activity_end.mp3');
-        load('act_join', 'sounds/activity_user_join.mp3');
-        load('act_left', 'sounds/activity_user_left.mp3');
-        load('music_start', 'sounds/lamusicadelvoz.wav');
-        load('vc_chat_msg', 'sounds/nuevomensajeenelchatdevoz.wav');
-        load('music_end_all', 'sounds/yanomasmusica.wav');
-        load('inicio', 'sounds/inicio.wav');
-        load('navegacion', 'sounds/navegacion.wav');
+        
+        const initSounds = async () => {
+          const list = [
+            ['flyin', 'sounds/flyin.wav'],
+            ['flyout', 'sounds/flyout.wav'],
+            ['typing', 'sounds/typing.wav'],
+            ['progress', 'SND01_sine/progress_loop.wav'],
+            ['toggleOn', 'SND01_sine/toggle_on.wav'],
+            ['toggleOff', 'SND01_sine/toggle_off.wav'],
+            ['act_launch', 'sounds/activity_launch.mp3'],
+            ['act_end', 'sounds/activity_end.mp3'],
+            ['act_join', 'sounds/activity_user_join.mp3'],
+            ['act_left', 'sounds/activity_user_left.mp3'],
+            ['music_start', 'sounds/lamusicadelvoz.wav'],
+            ['vc_chat_msg', 'sounds/nuevomensajeenelchatdevoz.wav'],
+            ['music_end_all', 'sounds/yanomasmusica.wav'],
+            ['inicio', 'sounds/inicio.wav'],
+            ['navegacion', 'sounds/navegacion.wav']
+          ];
+          for (const [k, u] of list) {
+            await load(k, u);
+          }
+        };
+        initSounds();
       } catch(e) {}
     }
 
     _playSfx(k, vol=0.4, loop=false, excl=null) {
       if (!this.actx || !this.sfxBuf[k]) return null;
-      if (this.actx.state === 'suspended') this.actx.resume();
-      if (excl && this.sfxNodes[excl]) this._stopSfx(this.sfxNodes[excl]);
       
-      try {
-        const src = this.actx.createBufferSource();
-        src.buffer = this.sfxBuf[k];
-        src.loop = loop;
-        const gain = this.actx.createGain();
-        
-        // Sin latencia de fade in
-        const t = this.actx.currentTime;
-        gain.gain.setValueAtTime(vol, t);
-        
-        src.connect(gain);
-        gain.connect(this.actx.destination);
-        src.start(0);
-        const node = { src, gain };
-        if (excl) this.sfxNodes[excl] = node;
-        return node;
-      } catch(e) { return null; }
+      const node = { src: null, gain: null, _stopped: false };
+      
+      const playNow = () => {
+        if (node._stopped) return; // Si se mandó a parar antes de que el contexto despertara
+        if (excl && this.sfxNodes[excl]) this._stopSfx(this.sfxNodes[excl]);
+        try {
+          const src = this.actx.createBufferSource();
+          src.buffer = this.sfxBuf[k];
+          src.loop = loop;
+          const gain = this.actx.createGain();
+          
+          const t = this.actx.currentTime;
+          gain.gain.setValueAtTime(vol, t);
+          
+          src.connect(gain);
+          gain.connect(this.actx.destination);
+          src.start(0);
+          
+          node.src = src;
+          node.gain = gain;
+          if (excl) this.sfxNodes[excl] = node;
+        } catch(e) {}
+      };
+
+      // Si el contexto de audio está dormido (ej. al abrir la app antes de tocar nada),
+      // programar el audio contra `currentTime = 0` causaba que se reprodujeran todos de golpe o se cortaran.
+      // Solución: Esperamos a que despierte el contexto de forma segura y luego reproducimos.
+      if (this.actx.state === 'suspended') {
+        this.actx.resume().then(playNow);
+      } else {
+        playNow();
+      }
+      return node;
     }
 
     _stopSfx(node) {
-      if (!node || !this.actx) return;
+      if (!node) return;
+      node._stopped = true;
+      if (!node.gain || !node.src || !this.actx) return;
       try {
         const t = this.actx.currentTime;
         node.gain.gain.cancelScheduledValues(t);
-        node.gain.gain.setValueAtTime(node.gain.gain.value, t);
+        node.gain.gain.setValueAtTime(node.gain.gain.value || 0, t);
         node.gain.gain.linearRampToValueAtTime(0, t + 0.04);
         node.src.stop(t + 0.04);
       } catch(e){}

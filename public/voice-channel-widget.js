@@ -939,8 +939,18 @@
       let _startY = 0;
       let _isSwiping = false;
       this.panel.addEventListener('touchstart', (e) => {
-        const rect = this.panel.getBoundingClientRect();
-        if (e.touches[0].clientY - rect.top < 100) {
+        // Permitir deslizar hacia abajo desde cualquier parte, siempre y cuando
+        // no estemos tocando un contenedor scrolleable que ya tenga scroll hacia abajo.
+        let target = e.target;
+        let canScroll = false;
+        while(target && target !== this.panel) {
+           if (target.scrollHeight > target.clientHeight && target.scrollTop > 0) {
+              canScroll = true;
+              break;
+           }
+           target = target.parentNode;
+        }
+        if (!canScroll) {
             _startY = e.touches[0].clientY;
             _isSwiping = true;
         } else {
@@ -952,7 +962,7 @@
         const currentY = e.touches[0].clientY;
         const deltaY = currentY - _startY;
         
-        if (deltaY > 50) {
+        if (deltaY > 60) {
             _isSwiping = false;
             if (this.panel.classList.contains('scale-100')) {
                 this._toggle();
@@ -1035,7 +1045,7 @@
         if (cfgBtn) {
            cfgBtn.onclick = () => {
              this._toggleSidebar();
-             this._showConfig();
+             this._showSettings();
            };
         }
         

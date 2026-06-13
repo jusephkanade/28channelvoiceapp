@@ -272,7 +272,6 @@
   .vc-marquee-container { display: flex; overflow: hidden; white-space: nowrap; mask-image: linear-gradient(to right, transparent, black 10px, black calc(100% - 10px), transparent); -webkit-mask-image: linear-gradient(to right, transparent, black 10px, black calc(100% - 10px), transparent); width: 100%; }
   .vc-marquee-content { flex-shrink: 0; animation: vc-marquee 12s linear infinite; padding-right: 2rem; }
   
-  .animate-spin { will-change: transform; transform: translateZ(0); }
   .animate-pulse { will-change: opacity, transform; transform: translateZ(0); }
   
   body.vc-light-theme { background-color: #f3f4f6 !important; color: #111827 !important; }
@@ -3203,6 +3202,48 @@
       }
       this.fab.title = 'Canal de Voz';
     }
+
+    // ── FOREGROUND SERVICE ──────────────────────────────────────────────────
+    async _startForegroundService() {
+      if (!window.Capacitor?.Plugins?.ForegroundService) return;
+      try {
+        await window.Capacitor.Plugins.ForegroundService.startForegroundService({
+          id: 28,
+          title: '#principal',
+          body: 'Llamada en progreso - 00:00',
+          smallIcon: 'ic_stat_name',
+          buttons: [
+            { id: 1, title: this.muted ? 'Activar Mic' : 'Silenciar' },
+            { id: 2, title: this.dnd ? 'Quitar DND' : 'No Molestar' }
+          ]
+        });
+      } catch (e) {
+        console.error('[VC] ForegroundService Start Error:', e);
+      }
+    }
+
+    async _updateForegroundService(str) {
+      if (!window.Capacitor?.Plugins?.ForegroundService) return;
+      try {
+        await window.Capacitor.Plugins.ForegroundService.updateForegroundService({
+          id: 28,
+          title: '#principal',
+          body: `Llamada en progreso - ${str}`,
+          buttons: [
+            { id: 1, title: this.muted ? 'Activar Mic' : 'Silenciar' },
+            { id: 2, title: this.dnd ? 'Quitar DND' : 'No Molestar' }
+          ]
+        });
+      } catch (e) {}
+    }
+
+    async _stopForegroundService() {
+      if (!window.Capacitor?.Plugins?.ForegroundService) return;
+      try {
+        await window.Capacitor.Plugins.ForegroundService.stopForegroundService();
+      } catch (e) {}
+    }
+
   }
 
   // ── INIT ─────────────────────────────────────────────────────────────────

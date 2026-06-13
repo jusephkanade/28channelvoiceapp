@@ -6,6 +6,12 @@ import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 import { CapacitorHttp } from '@capacitor/core';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { FileOpener } from '@capawesome-team/capacitor-file-opener';
+import { ForegroundService } from '@capawesome-team/capacitor-android-foreground-service';
+
+if (!window.Capacitor) window.Capacitor = { Plugins: {} };
+if (!window.Capacitor.Plugins) window.Capacitor.Plugins = {};
+window.Capacitor.Plugins.ForegroundService = ForegroundService;
+
 const firebaseConfig = {
     apiKey: "AIzaSyDFkuktrXnsV9-jg2bv5dpJQRR-he8PT3g",
     authDomain: "yairealvarado.firebaseapp.com",

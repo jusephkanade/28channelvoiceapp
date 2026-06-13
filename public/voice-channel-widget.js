@@ -393,7 +393,7 @@
       this._savedName  = null;
       this._savedPass  = null;
       this._callStart  = null;
-      this._timerInt   = null;
+      this._timerRAF   = null;
       this._analyser   = null;
       this._analyserData = null;
       this._speakRaf   = null;
@@ -425,7 +425,7 @@
       this._musicCurrentTrack = null;
       this._musicVolume = 50;
       this._musicPlaying = false;
-      this._musicProgressInt = null;
+      this._musicProgressRAF = null;
       this._ytPlayer = null;
       this._ytApiLoading = false;
       this._ytApiCallbacks = [];
@@ -449,7 +449,7 @@
           this._lastLang = current;
           this.updateTranslations();
         }
-      }, 500);
+      }, 5000);
 
       this.ice = {
         iceServers: [
@@ -1558,7 +1558,7 @@
         
         const existingMic = iconContainer.querySelector('.vc-mico');
         if ((isMuted || u.localMuted) && !existingMic) {
-          iconContainer.insertAdjacentHTML('beforeend', `<span class="text-red-500 w-6 h-6 vc-mico" title="${u.localMuted ? 'Silenciado localmente' : 'Silenciado'}">${ICONS.micOff}</span>`);
+          iconContainer.insertAdjacentHTML('beforeend', `<span class="text-red-500 w-5 h-5 flex items-center justify-center [&>svg]:w-3.5 [&>svg]:h-3.5 vc-mico" title="${u.localMuted ? 'Silenciado localmente' : 'Silenciado'}">${ICONS.micOff}</span>`);
         } else if (!isMuted && !u.localMuted && existingMic) {
           existingMic.remove();
         } else if ((isMuted || u.localMuted) && existingMic) {
@@ -1883,7 +1883,7 @@
             this._render(this._tplConnected());
 
             // Prevent duplicate timers/speakers
-            if (!this._timerInt) this._startTimer();
+            if (!this._timerRAF) this._startTimer();
             if (!this._analyser) this._setupSpeaking();
             if (!this._wakeLock && !this._silentAudio) this._startKeepAlive();
 
@@ -2208,7 +2208,9 @@
     // ── MUTE ──────────────────────────────────────────────────────────────
     _toggleMute() {
       this.muted = !this.muted;
-      this.stream.getAudioTracks().forEach(t => { t.enabled = !this.muted; });
+      if (this.stream) {
+        this.stream.getAudioTracks().forEach(t => { t.enabled = !this.muted; });
+      }
       this.socket && this.socket.emit('mute_state', { muted: this.muted });
       
       const btn = document.getElementById('vc-mute');
@@ -3094,6 +3096,7 @@
       this._musicOpen = false;
       if (this.stream) { this.stream.getTracks().forEach(t => t.stop()); this.stream = null; }
       this._processedStream = null;
+      this.pendingIce.clear();
       this.connected = false;
       this.myId = null;
       this.users = [];
@@ -3375,8 +3378,8 @@
             if (!this.panel.classList.contains('open') && this.connected) {
               this._bar.classList.add('show');
             }
-            // Update Foreground Service notification every second
-            if (s > 0) {
+            // Update Foreground Service notification every 5 seconds (throttled to reduce native bridge calls)
+            if (s > 0 && s % 5 === 0) {
               this._updateForegroundService(str);
             }
           }

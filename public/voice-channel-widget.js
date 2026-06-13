@@ -274,6 +274,17 @@
   
   .animate-pulse { will-change: opacity, transform; transform: translateZ(0); }
   
+  #vc-panel {
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    box-sizing: border-box;
+  }
+  
+  #app-container {
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    box-sizing: border-box;
+  }
   body.vc-light-theme { background-color: #f3f4f6 !important; color: #111827 !important; }
   body.vc-light-theme #vc-panel { background-color: #f5f5f5 !important; }
   body.vc-light-theme #app-container { background-color: #f3f4f6 !important; }
@@ -3205,7 +3216,9 @@
 
     // ── FOREGROUND SERVICE ──────────────────────────────────────────────────
     async _startForegroundService() {
-      if (!window.Capacitor?.Plugins?.ForegroundService) return;
+      if (!window.Capacitor?.Plugins?.ForegroundService) {
+        return;
+      }
       try {
         const fs = window.Capacitor.Plugins.ForegroundService;
         let perm = await fs.checkPermissions();
@@ -3225,6 +3238,7 @@
         });
       } catch (e) {
         console.error('[VC] ForegroundService Start Error:', e);
+        alert('FS Error: ' + e.message);
       }
     }
 

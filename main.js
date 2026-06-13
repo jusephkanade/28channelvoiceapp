@@ -161,6 +161,18 @@ getRedirectResult(auth).catch(err => {
   alert("Error post-login: " + err.message);
 });
 
+window.yaireSignOut = async () => {
+  try {
+    if (window.Capacitor && window.Capacitor.Plugins.FirebaseAuthentication) {
+      await window.Capacitor.Plugins.FirebaseAuthentication.signOut();
+    }
+    await auth.signOut();
+    window.location.reload();
+  } catch (err) {
+    console.error("Error signing out", err);
+  }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
   // Add a slight delay to ensure the widget has attached to the DOM
   setTimeout(() => {

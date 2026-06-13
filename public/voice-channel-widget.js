@@ -597,6 +597,18 @@
               Buscar Actualizaciones
             </button>
           </div>
+          
+          <div class="text-xs text-white/40 font-bold uppercase tracking-widest mb-4">Cuenta & Enlaces</div>
+          <div class="bg-black/20 border border-white/10 rounded-2xl p-4 mb-6 flex flex-col gap-3">
+            <button id="vc-btn-go-main" class="w-full py-3 bg-[#4F46E5]/20 hover:bg-[#4F46E5]/40 text-[#818CF8] text-xs font-bold rounded-xl transition-colors border border-[#4F46E5]/30 flex items-center justify-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+              Ingresar a 28E Main
+            </button>
+            <button id="vc-btn-logout" class="w-full py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-bold rounded-xl transition-colors border border-red-500/20 flex items-center justify-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+              Cerrar Sesión
+            </button>
+          </div>
         </div>
       `;
       
@@ -649,6 +661,28 @@
             setTimeout(() => btnUpdate.innerHTML = prevHtml, 3000);
           });
       });
+
+      const btnGoMain = document.getElementById('vc-btn-go-main');
+      if (btnGoMain) {
+        btnGoMain.addEventListener('click', () => {
+          if (window.Capacitor && window.Capacitor.Plugins.Browser) {
+             window.Capacitor.Plugins.Browser.open({ url: 'https://charlygustav.github.io/28E/' });
+          } else {
+             window.open('https://charlygustav.github.io/28E/', '_system');
+          }
+        });
+      }
+
+      const btnLogout = document.getElementById('vc-btn-logout');
+      if (btnLogout) {
+        btnLogout.addEventListener('click', () => {
+          const conf = confirm('¿Estás seguro de que deseas cerrar sesión?');
+          if (conf && window.yaireSignOut) {
+             window.yaireSignOut();
+          }
+        });
+      }
+      
       
       requestAnimationFrame(() => modal.classList.add('opacity-100'));
     }
@@ -1277,8 +1311,8 @@
           ? `<img src="${u.photoURL || window.yaireCurrentUser?.photoURL}" class="w-full h-full rounded-full object-cover" draggable="false" referrerpolicy="no-referrer" />` 
           : initials;
 
-        const micIcon = isMuted ? `<span class="text-red-500 w-6 h-6 vc-mico">${ICONS.micOff}</span>` : '';
-        const bellIcon = isDnd ? `<span class="text-purple-400 w-6 h-6 vc-dico" title="DND">${ICONS.dnd}</span>` : '';
+        const micIcon = isMuted ? `<span class="text-red-500 w-5 h-5 flex items-center justify-center [&>svg]:w-3.5 [&>svg]:h-3.5 vc-mico">${ICONS.micOff}</span>` : '';
+        const bellIcon = isDnd ? `<span class="text-purple-400 w-5 h-5 flex items-center justify-center [&>svg]:w-3.5 [&>svg]:h-3.5 vc-dico" title="DND">${ICONS.dnd}</span>` : '';
 
         return `
           <div class="flex items-center gap-3 p-2 hover:bg-white/5 rounded-xl transition-colors vc-user group" id="vc-u-${u.id}">
@@ -1314,7 +1348,7 @@
           </div>
           <div class="flex items-center gap-1">
             <button class="text-white/30 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors" id="vc-btn-menu" title="Menú">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
             <button class="text-white/30 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors" id="vc-close">✕</button>
           </div>
@@ -1350,7 +1384,7 @@
             <div class="p-3 border-t border-white/5 flex gap-2">
               <input class="flex-1 bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white text-xs outline-none focus:border-amber-500/50 transition-colors" id="vc-chat-in" type="text" placeholder="${_t('vc_chat_ph')}" autocomplete="off"/>
               <button class="bg-amber-500 text-black w-10 h-10 rounded-xl flex items-center justify-center hover:bg-amber-400 transition-colors shadow-lg" id="vc-chat-send">
-                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
               </button>
             </div>
           </div>
@@ -1367,11 +1401,11 @@
         <!-- Global Controls -->
         <div class="flex gap-2 p-4 border-t border-white/5 bg-zinc-900/50">
           <button class="flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${this.muted ? 'bg-red-500/10 text-red-500 border border-red-500/30' : 'bg-white/5 text-white/70 border border-white/10 hover:bg-white/10 hover:text-white'}" id="vc-mute">
-            <span class="w-6 h-6 [&>svg]:w-4 [&>svg]:h-4 flex items-center justify-center">${this.muted ? ICONS.micOff : ICONS.mic}</span>
+            <span class="w-5 h-5 [&>svg]:w-3.5 [&>svg]:h-3.5 flex items-center justify-center">${this.muted ? ICONS.micOff : ICONS.mic}</span>
             ${this.muted ? _t('btn_muted') : _t('btn_mic')}
           </button>
           <button class="flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${this.dnd ? 'bg-purple-500/10 text-purple-400 border border-purple-500/30' : 'bg-white/5 text-white/70 border border-white/10 hover:bg-white/10 hover:text-white'}" id="vc-dnd">
-            <span class="w-6 h-6 [&>svg]:w-4 [&>svg]:h-4 flex items-center justify-center">${ICONS.bell}</span> DND
+            <span class="w-5 h-5 [&>svg]:w-3.5 [&>svg]:h-3.5 flex items-center justify-center">${ICONS.bell}</span> DND
           </button>
           <button class="w-[46px] flex-shrink-0 rounded-xl bg-red-500/10 text-red-500 border border-red-500/20 flex items-center justify-center hover:bg-red-500/20 transition-all [&>svg]:w-4 [&>svg]:h-4" id="vc-leave" title="Salir">
             ${ICONS.phone}
@@ -1470,7 +1504,7 @@
                   <div class="text-xs uppercase font-bold text-white/40 tracking-wider">${u.displayName}</div>
                 </div>
                 <button class="w-full text-left px-3 py-2 rounded-lg text-sm text-white/90 hover:bg-white/10 hover:text-white transition-colors flex items-center gap-2">
-                  <span class="w-6 h-6 flex items-center justify-center ${isLocallyMuted ? 'text-green-400' : 'text-red-400'}">${isLocallyMuted ? ICONS.mic : ICONS.micOff}</span>
+                  <span class="w-5 h-5 flex items-center justify-center ${isLocallyMuted ? 'text-green-400' : 'text-red-400'}">${isLocallyMuted ? ICONS.mic : ICONS.micOff}</span>
                   ${isLocallyMuted ? 'Desmutear localmente' : 'Silenciar localmente'}
                 </button>
               `;
@@ -1519,8 +1553,8 @@
         const existingDnd = iconContainer.querySelector('.vc-dico');
         if (isDnd && !existingDnd) {
           const mico = iconContainer.querySelector('.vc-mico');
-          if (mico) mico.insertAdjacentHTML('beforebegin', `<span class="text-purple-400 w-6 h-6 vc-dico" title="${_t('btn_dnd')}">${ICONS.dnd}</span>`);
-          else iconContainer.insertAdjacentHTML('beforeend', `<span class="text-purple-400 w-6 h-6 vc-dico" title="${_t('btn_dnd')}">${ICONS.dnd}</span>`);
+          if (mico) mico.insertAdjacentHTML('beforebegin', `<span class="text-purple-400 w-5 h-5 flex items-center justify-center [&>svg]:w-3.5 [&>svg]:h-3.5 vc-dico" title="${_t('btn_dnd')}">${ICONS.dnd}</span>`);
+          else iconContainer.insertAdjacentHTML('beforeend', `<span class="text-purple-400 w-5 h-5 flex items-center justify-center [&>svg]:w-3.5 [&>svg]:h-3.5 vc-dico" title="${_t('btn_dnd')}">${ICONS.dnd}</span>`);
         } else if (!isDnd && existingDnd) {
           existingDnd.remove();
         }
@@ -2183,7 +2217,7 @@
       const btn = document.getElementById('vc-mute');
       if (btn) {
         btn.className = `flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${this.muted ? 'bg-red-500/10 text-red-500 border border-red-500/30' : 'bg-white/5 text-white/70 border border-white/10 hover:bg-white/10 hover:text-white'}`;
-        btn.innerHTML = `<span class="w-6 h-6 [&>svg]:w-4 [&>svg]:h-4 flex items-center justify-center">${this.muted ? ICONS.micOff : ICONS.mic}</span> ${this.muted ? _t('btn_muted') : _t('btn_mic')}`;
+        btn.innerHTML = `<span class="w-5 h-5 [&>svg]:w-3.5 [&>svg]:h-3.5 flex items-center justify-center">${this.muted ? ICONS.micOff : ICONS.mic}</span> ${this.muted ? _t('btn_muted') : _t('btn_mic')}`;
         const svg = btn.querySelector('svg');
         if (svg) {
           svg.style.transform = 'scale(1.3)';
@@ -2209,7 +2243,7 @@
       const btn = document.getElementById('vc-dnd');
       if (btn) {
         btn.className = `flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${this.dnd ? 'bg-purple-500/10 text-purple-400 border border-purple-500/30' : 'bg-white/5 text-white/70 border border-white/10 hover:bg-white/10 hover:text-white'}`;
-        btn.innerHTML = `<span class="w-6 h-6 [&>svg]:w-4 [&>svg]:h-4 flex items-center justify-center">${ICONS.bell}</span> DND`;
+        btn.innerHTML = `<span class="w-5 h-5 [&>svg]:w-3.5 [&>svg]:h-3.5 flex items-center justify-center">${ICONS.bell}</span> DND`;
         const svg = btn.querySelector('svg');
         if (svg) {
           svg.style.transform = 'scale(1.2) rotate(-15deg)';
@@ -3000,23 +3034,38 @@
 
     _startMusicProgress() {
       this._stopMusicProgress();
-      this._musicProgressInt = setInterval(() => {
+      
+      let lastUpdate = 0;
+      const updateProgress = (timestamp) => {
         if (!this._musicPlaying || !this._ytPlayer) return;
-        if (typeof this._ytPlayer.getCurrentTime !== 'function') return;
-        const current = this._ytPlayer.getCurrentTime();
-        const duration = this._ytPlayer.getDuration();
-        const fill = document.getElementById('vc-music-progress-fill');
-        const timeCurrent = document.getElementById('vc-music-time-current');
-        const timeTotal = document.getElementById('vc-music-time-total');
-        if (fill && duration > 0) fill.style.width = ((current / duration) * 100) + '%';
-        const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
-        if (timeCurrent) timeCurrent.textContent = fmt(current);
-        if (timeTotal) timeTotal.textContent = fmt(duration);
-      }, 500);
+        
+        // Limitar a ~2 actualizaciones por segundo (500ms) para no sobrecargar el DOM
+        if (timestamp - lastUpdate >= 500) {
+          lastUpdate = timestamp;
+          if (typeof this._ytPlayer.getCurrentTime === 'function') {
+            const current = this._ytPlayer.getCurrentTime();
+            const duration = this._ytPlayer.getDuration();
+            const fill = document.getElementById('vc-music-progress-fill');
+            const timeCurrent = document.getElementById('vc-music-time-current');
+            const timeTotal = document.getElementById('vc-music-time-total');
+            if (fill && duration > 0) fill.style.width = ((current / duration) * 100) + '%';
+            const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+            if (timeCurrent) timeCurrent.textContent = fmt(current);
+            if (timeTotal) timeTotal.textContent = fmt(duration);
+          }
+        }
+        
+        this._musicProgressRAF = requestAnimationFrame(updateProgress);
+      };
+      
+      this._musicProgressRAF = requestAnimationFrame(updateProgress);
     }
 
     _stopMusicProgress() {
-      if (this._musicProgressInt) { clearInterval(this._musicProgressInt); this._musicProgressInt = null; }
+      if (this._musicProgressRAF) { 
+        cancelAnimationFrame(this._musicProgressRAF); 
+        this._musicProgressRAF = null; 
+      }
     }
 
     _destroyMusicPlayer() {
@@ -3310,26 +3359,43 @@
     _startTimer() {
       this._callStart = Date.now();
       this._startForegroundService();
-      this._timerInt = setInterval(() => {
-        const s = Math.floor((Date.now() - this._callStart) / 1000);
-        const str = `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
-        const el = document.getElementById('vc-timer');
-        const barEl = document.getElementById('vc-bar-timer');
-        if (el) el.textContent = str;
-        if (barEl) barEl.textContent = str;
-        if (!this.panel.classList.contains('open') && this.connected) {
-          this._bar.classList.add('show');
+      
+      let lastUpdate = 0;
+      let lastSeconds = -1;
+      
+      const updateTimer = (timestamp) => {
+        if (timestamp - lastUpdate >= 1000) {
+          lastUpdate = timestamp;
+          
+          const s = Math.floor((Date.now() - this._callStart) / 1000);
+          if (s !== lastSeconds) {
+            lastSeconds = s;
+            const str = `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+            const el = document.getElementById('vc-timer');
+            const barEl = document.getElementById('vc-bar-timer');
+            if (el) el.textContent = str;
+            if (barEl) barEl.textContent = str;
+            if (!this.panel.classList.contains('open') && this.connected) {
+              this._bar.classList.add('show');
+            }
+            // Update Foreground Service notification every second
+            if (s > 0) {
+              this._updateForegroundService(str);
+            }
+          }
         }
-        // Update Foreground Service notification every second
-        if (s > 0) {
-          this._updateForegroundService(str);
-        }
-      }, 1000);
+        
+        this._timerRAF = requestAnimationFrame(updateTimer);
+      };
+      
+      this._timerRAF = requestAnimationFrame(updateTimer);
     }
 
     _stopTimer() {
-      clearInterval(this._timerInt);
-      this._timerInt = null;
+      if (this._timerRAF) {
+        cancelAnimationFrame(this._timerRAF);
+        this._timerRAF = null;
+      }
       this._stopForegroundService();
       if (this._callStart) {
         const dur = Math.floor((Date.now() - this._callStart) / 1000);

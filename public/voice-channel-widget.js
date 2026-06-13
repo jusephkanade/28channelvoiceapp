@@ -526,12 +526,15 @@
 
     _checkForUpdates() {
       if (!window.APP_BUILD_DATE || window.APP_BUILD_DATE.includes("BUILD_DATE")) return;
-      fetch('https://api.github.com/repos/jusephkanade/28channelvoiceapp/commits/master')
+      // Consultamos los releases (lanzamientos oficiales ya compilados) en lugar de los commits
+      fetch('https://api.github.com/repos/jusephkanade/28channelvoiceapp/releases/latest')
         .then(r => r.json())
         .then(data => {
-          const latestCommitDate = new Date(data.commit.committer.date).getTime();
+          if (!data || !data.published_at) return;
+          const latestReleaseDate = new Date(data.published_at).getTime();
           const myBuildDate = new Date(window.APP_BUILD_DATE).getTime();
-          if (latestCommitDate > myBuildDate + 60000) {
+          // Solo mostramos actualización si hay una versión *publicada* más reciente que nuestra compilación
+          if (latestReleaseDate > myBuildDate + 60000) {
             this._showUpdateBanner();
           }
         })
@@ -625,13 +628,14 @@
         const prevHtml = btnUpdate.innerHTML;
         btnUpdate.innerHTML = `<svg class="w-4 h-4 animate-spin mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>`;
         
-        fetch('https://api.github.com/repos/jusephkanade/28channelvoiceapp/commits/master')
+        fetch('https://api.github.com/repos/jusephkanade/28channelvoiceapp/releases/latest')
           .then(r => r.json())
           .then(data => {
-            const latestCommitDate = new Date(data.commit.committer.date).getTime();
+            if (!data || !data.published_at) { throw new Error("No release found"); }
+            const latestReleaseDate = new Date(data.published_at).getTime();
             const myBuildDate = window.APP_BUILD_DATE && !window.APP_BUILD_DATE.includes("BUILD_DATE") ? new Date(window.APP_BUILD_DATE).getTime() : 0;
             
-            if (latestCommitDate > myBuildDate + 60000) {
+            if (latestReleaseDate > myBuildDate + 60000) {
               this._showUpdateBanner();
               btnUpdate.innerHTML = prevHtml;
             } else {

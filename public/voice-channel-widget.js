@@ -3217,7 +3217,7 @@
           id: 28,
           title: '#principal',
           body: 'Llamada en progreso - 00:00',
-          smallIcon: 'ic_stat_name',
+          smallIcon: 'ic_launcher',
           buttons: [
             { id: 1, title: this.muted ? 'Activar Mic' : 'Silenciar' },
             { id: 2, title: this.dnd ? 'Quitar DND' : 'No Molestar' }

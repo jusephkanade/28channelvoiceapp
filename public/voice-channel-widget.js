@@ -1190,7 +1190,7 @@
         </div>
 
         <!-- Main Content Area -->
-        <div class="flex-1 relative overflow-hidden">
+        <div class="flex-1 relative overflow-hidden" id="vc-swipe-area">
           
           <!-- ROOM TAB -->
           <div class="absolute inset-0 flex flex-col ${isRoom ? 'opacity-100 translate-x-0 pointer-events-auto' : 'opacity-0 -translate-x-8 pointer-events-none'}" id="vc-content-room">
@@ -1494,6 +1494,47 @@
       
       // Global Config Button
       if (tabConfig) tabConfig.addEventListener('click', () => this._showSettings());
+
+      // ── SWIPE GESTURE for tab switching ──
+      const swipeArea = document.getElementById('vc-swipe-area');
+      if (swipeArea) {
+        const TABS = ['room', 'chat', 'music'];
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let isSwiping = false;
+
+        swipeArea.addEventListener('touchstart', (e) => {
+          touchStartX = e.touches[0].clientX;
+          touchStartY = e.touches[0].clientY;
+          isSwiping = true;
+        }, { passive: true });
+
+        swipeArea.addEventListener('touchmove', (e) => {
+          if (!isSwiping) return;
+          const dx = Math.abs(e.touches[0].clientX - touchStartX);
+          const dy = Math.abs(e.touches[0].clientY - touchStartY);
+          // If scrolling vertically, cancel swipe detection
+          if (dy > dx && dy > 10) isSwiping = false;
+        }, { passive: true });
+
+        swipeArea.addEventListener('touchend', (e) => {
+          if (!isSwiping) return;
+          isSwiping = false;
+          const dx = e.changedTouches[0].clientX - touchStartX;
+          if (Math.abs(dx) < 50) return; // Too short, ignore
+
+          const currentIdx = TABS.indexOf(this._activeTab);
+          if (currentIdx === -1) return;
+
+          if (dx < 0 && currentIdx < TABS.length - 1) {
+            // Swipe left → next tab
+            switchTab(TABS[currentIdx + 1]);
+          } else if (dx > 0 && currentIdx > 0) {
+            // Swipe right → previous tab
+            switchTab(TABS[currentIdx - 1]);
+          }
+        }, { passive: true });
+      }
 
       // Chat send & typing
       const chatSend = document.getElementById('vc-chat-send');

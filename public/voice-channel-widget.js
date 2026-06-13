@@ -272,6 +272,9 @@
   .vc-marquee-container { display: flex; overflow: hidden; white-space: nowrap; mask-image: linear-gradient(to right, transparent, black 10px, black calc(100% - 10px), transparent); -webkit-mask-image: linear-gradient(to right, transparent, black 10px, black calc(100% - 10px), transparent); width: 100%; }
   .vc-marquee-content { flex-shrink: 0; animation: vc-marquee 12s linear infinite; padding-right: 2rem; }
   
+  .animate-spin { will-change: transform; transform: translateZ(0); }
+  .animate-pulse { will-change: opacity, transform; transform: translateZ(0); }
+  
   body.vc-light-theme { background-color: #f3f4f6 !important; color: #111827 !important; }
   body.vc-light-theme #vc-panel { background-color: #f5f5f5 !important; }
   body.vc-light-theme #app-container { background-color: #f3f4f6 !important; }
@@ -305,6 +308,7 @@
   .vc-light-theme .text-white\\/50 { color: rgba(17,24,39,0.6) !important; }
   .vc-light-theme .border-amber-500 { border-color: #d97706 !important; }
   .vc-light-theme .border-amber-500\\/20 { border-color: rgba(217,119,6,0.3) !important; }
+  .vc-light-theme .border-t-amber-500 { border-top-color: #d97706 !important; }
   .vc-light-theme .border-zinc-800 { border-color: #d1d5db !important; }
   .vc-light-theme .bg-amber-500\\/30 { background-color: rgba(217,119,6,0.2) !important; }
   /* Amber text & bg */
@@ -315,8 +319,13 @@
   .vc-light-theme .bg-amber-500\\/10 { background-color: rgba(217,119,6,0.12) !important; }
   .vc-light-theme .bg-amber-500\\/20 { background-color: rgba(217,119,6,0.15) !important; }
   .vc-light-theme .bg-amber-500 { background-color: #d97706 !important; }
-  /* History section */
+  .vc-light-theme .text-amber-400 { color: #d97706 !important; }
+  .vc-light-theme .bg-amber-400\\/10 { background-color: rgba(217,119,6,0.1) !important; }
+  .vc-light-theme .border-amber-400\\/20 { border-color: rgba(217,119,6,0.2) !important; }
+  /* History section & Modal */
   .vc-light-theme .bg-zinc-900\\/30 { background-color: rgba(255,255,255,0.6) !important; }
+  .vc-light-theme .bg-zinc-950\\/90 { background-color: rgba(243,244,246,0.9) !important; }
+  .vc-light-theme .bg-black\\/80 { background-color: rgba(0,0,0,0.2) !important; }
   /* Orbs */
   .vc-light-theme .bg-pink-500\\/10 { background-color: rgba(236,72,153,0.06) !important; }
   .vc-light-theme .bg-pink-500\\/20 { background-color: rgba(236,72,153,0.08) !important; }

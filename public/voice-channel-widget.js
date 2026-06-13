@@ -556,7 +556,7 @@
       modal.innerHTML = `
         <div class="flex items-center gap-3 px-5 pb-4 bg-zinc-900/50 border-b border-white/5" style="padding-top: calc(1rem + env(safe-area-inset-top, 0px))">
           <button class="w-10 h-10 rounded-xl bg-white/5 text-white/70 flex items-center justify-center hover:bg-white/10 transition-colors" id="vc-settings-back">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
           </button>
           <div class="text-white font-bold text-sm">Configuración</div>
         </div>
@@ -567,11 +567,11 @@
           <div class="bg-black/20 border border-white/10 rounded-2xl p-4 mb-6">
             <div class="flex items-center gap-3 mb-4">
               <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/70">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
               </div>
               <div>
                 <div class="text-white text-sm font-bold">Tema</div>
-                <div class="text-white/40 text-[10px]">Elige el aspecto de la aplicación</div>
+                <div class="text-white/40 text-xs">Elige el aspecto de la aplicación</div>
               </div>
             </div>
             <div class="flex gap-2" id="vc-theme-selector">
@@ -586,11 +586,11 @@
           <div class="bg-black/20 border border-white/10 rounded-2xl p-4">
             <div class="flex items-center gap-3 mb-4">
               <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
               </div>
               <div>
                 <div class="text-white text-sm font-bold">Actualizaciones</div>
-                <div class="text-white/40 text-[10px]">Descargar nueva versión in-app</div>
+                <div class="text-white/40 text-xs">Descargar nueva versión in-app</div>
               </div>
             </div>
             <button id="vc-btn-check-update-modal" class="w-full py-3 bg-white/5 hover:bg-white/10 text-white text-xs font-bold rounded-xl transition-colors border border-white/10">
@@ -627,7 +627,7 @@
       const btnUpdate = document.getElementById('vc-btn-check-update-modal');
       btnUpdate.addEventListener('click', () => {
         const prevHtml = btnUpdate.innerHTML;
-        btnUpdate.innerHTML = `<svg class="w-4 h-4 animate-spin mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>`;
+        btnUpdate.innerHTML = `<svg class="w-6 h-6 animate-spin mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>`;
         
         fetch('https://api.github.com/repos/jusephkanade/28channelvoiceapp/releases/latest')
           .then(r => r.json())
@@ -879,7 +879,7 @@
         </div>
         <div class="flex flex-col justify-center min-w-[65px]">
           <div class="flex items-center gap-1.5 mb-1">
-             <span class="text-[9px] font-extrabold text-green-400 uppercase tracking-[0.2em] leading-none transition-colors duration-300" id="vc-bar-title">${_t('bar_conn').split(' · ')[0]}</span>
+             <span class="text-xs opacity-80 font-extrabold text-green-400 uppercase tracking-[0.2em] leading-none transition-colors duration-300" id="vc-bar-title">${_t('bar_conn').split(' · ')[0]}</span>
              <div class="flex items-center gap-1" id="vc-bar-icons">
                <div id="vc-bar-music-icon" class="hidden text-amber-500 transition-opacity">
                  <svg class="w-3 h-3 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>
@@ -890,11 +890,11 @@
                </div>
              </div>
           </div>
-          <span id="vc-bar-sub" class="text-[10px] text-white/50 font-medium leading-none">${_t('bar_conn').split(' · ')[1]}</span>
+          <span id="vc-bar-sub" class="text-xs text-white/50 font-medium leading-none">${_t('bar_conn').split(' · ')[1]}</span>
         </div>
         <div class="w-[1px] h-6 bg-white/10 mx-1"></div>
         <div class="flex items-center px-1">
-          <span id="vc-bar-timer" class="text-white font-mono text-[13px] font-bold tabular-nums tracking-wide">00:00</span>
+          <span id="vc-bar-timer" class="text-white font-mono text-base font-bold tabular-nums tracking-wide">00:00</span>
         </div>
       `;
 
@@ -994,11 +994,11 @@
             <div class="relative z-10 flex items-center justify-between px-5 py-3 border-b border-white/5 bg-black/20 backdrop-blur-sm">
               <div class="flex items-center gap-3">
                 <div class="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center relative overflow-hidden [&>svg]:w-4 [&>svg]:h-4 [&>svg]:relative [&>svg]:z-10">${ICONS.sound}</div>
-                <div><div class="text-white font-bold text-[13px]">#principal</div><div class="text-white/40 text-[10px]">${_t('vc_sub')}</div></div>
+                <div><div class="text-white font-bold text-base">#principal</div><div class="text-white/40 text-xs">${_t('vc_sub')}</div></div>
               </div>
               <div class="flex items-center gap-1">
                 <button class="text-white/30 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors" id="vc-tab-config" title="Configuración">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                 </button>
                 <button class="text-white/30 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors" id="vc-close">✕</button>
               </div>
@@ -1015,7 +1015,7 @@
               <p class="text-white/40 text-xs mb-4 leading-relaxed max-w-[250px] mx-auto">${_t('vc_req_login')}</p>
               
               <button id="vc-google-login-btn" class="w-full flex items-center justify-center gap-3 bg-white/5 border border-white/10 text-white font-bold py-2.5 px-4 rounded-xl hover:bg-white/10 hover:border-white/20 transition-all shadow-xl backdrop-blur-md group">
-                  <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-4 h-4 group-hover:scale-110 transition-transform" />
+                  <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-6 h-6 group-hover:scale-110 transition-transform" />
                   ${_t('vc_login_google')}
               </button>
             </div>
@@ -1031,11 +1031,11 @@
           <div class="relative z-10 flex items-center justify-between px-5 py-3 border-b border-white/5 bg-black/20 backdrop-blur-sm">
             <div class="flex items-center gap-3">
               <div class="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center relative overflow-hidden [&>svg]:w-4 [&>svg]:h-4 [&>svg]:relative [&>svg]:z-10">${ICONS.sound}</div>
-              <div><div class="text-white font-bold text-[13px]">#principal</div><div class="text-white/40 text-[10px]">${_t('vc_sub')}</div></div>
+              <div><div class="text-white font-bold text-base">#principal</div><div class="text-white/40 text-xs">${_t('vc_sub')}</div></div>
             </div>
             <div class="flex items-center gap-1">
               <button class="text-white/30 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors" id="vc-tab-config" title="Configuración">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
               </button>
               <button class="text-white/30 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors" id="vc-close">✕</button>
             </div>
@@ -1047,7 +1047,7 @@
                     <div class="absolute inset-0 rounded-full bg-amber-500/30 blur-md group-hover:bg-amber-500/50 transition-colors duration-500 animate-pulse"></div>
                     <img src="${user.photoURL}" class="w-16 h-16 rounded-full object-cover border-2 border-amber-500/50 relative z-10 shadow-xl" draggable="false" referrerpolicy="no-referrer" />
                 </div>
-                <div class="text-[9px] text-amber-500/80 font-bold uppercase tracking-[0.2em] mb-1">${_t('vc_session_as')}</div>
+                <div class="text-xs opacity-80 text-amber-500/80 font-bold uppercase tracking-[0.2em] mb-1">${_t('vc_session_as')}</div>
                 <div class="text-xl font-extrabold text-white tracking-tight">${user.displayName}</div>
             </div>
             
@@ -1058,8 +1058,8 @@
                 <button id="vc-join" class="relative w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-sm rounded-xl shadow-xl transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed">
                   <span class="relative z-10 flex items-center justify-center gap-2">${_t('btn_join')}</span>
                 </button>
-                <div id="vc-conn-count" class="text-[10px] font-medium text-center flex items-center justify-center transition-opacity opacity-0 h-3"></div>
-                <div class="text-red-400 text-[10px] text-center font-medium empty:hidden" id="vc-err">${err}</div>
+                <div id="vc-conn-count" class="text-xs font-medium text-center flex items-center justify-center transition-opacity opacity-0 h-3"></div>
+                <div class="text-red-400 text-xs text-center font-medium empty:hidden" id="vc-err">${err}</div>
             </div>
           </div>
           ${this._tplHistory()}
@@ -1075,11 +1075,11 @@
           <div class="relative z-10 flex items-center justify-between px-5 py-4 border-b border-white/5 bg-black/20 backdrop-blur-sm">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center [&>svg]:w-5 [&>svg]:h-5">${ICONS.sound}</div>
-              <div><div class="text-white font-bold text-sm">#principal</div><div class="text-white/40 text-[11px]">${_t('st_conn')}</div></div>
+              <div><div class="text-white font-bold text-sm">#principal</div><div class="text-white/40 text-sm opacity-90">${_t('st_conn')}</div></div>
             </div>
             <div class="flex items-center gap-1">
               <button class="text-white/30 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors" id="vc-tab-config" title="Configuración">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
               </button>
               <button class="text-white/30 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors" id="vc-close">✕</button>
             </div>
@@ -1104,11 +1104,11 @@
           <div class="relative z-10 flex items-center justify-between px-5 py-4 border-b border-white/5 bg-black/20 backdrop-blur-sm">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-xl bg-red-500/10 text-red-500 flex items-center justify-center [&>svg]:w-5 [&>svg]:h-5">${ICONS.sound}</div>
-              <div><div class="text-white font-bold text-sm">#principal</div><div class="text-red-400 font-bold text-[11px] uppercase tracking-wider">${_t('st_disc')}</div></div>
+              <div><div class="text-white font-bold text-sm">#principal</div><div class="text-red-400 font-bold text-sm opacity-90 uppercase tracking-wider">${_t('st_disc')}</div></div>
             </div>
             <div class="flex items-center gap-1">
               <button class="text-white/30 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors" id="vc-tab-config" title="Configuración">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
               </button>
               <button class="text-white/30 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors" id="vc-close">✕</button>
             </div>
@@ -1134,10 +1134,10 @@
         const d = new Date(s.date);
         const label = d.toLocaleDateString(lang, {month:'short',day:'numeric'}) + ' ' + d.toLocaleTimeString(lang, {hour:'2-digit',minute:'2-digit'});
         const m = Math.floor(s.duration/60), sec = s.duration%60;
-        return `<div class="flex justify-between text-[10px] py-1"><span class="text-white/70 font-medium">${s.name}</span><span class="text-white/30">${label} · ${m}m${sec}s</span></div>`;
+        return `<div class="flex justify-between text-xs py-1"><span class="text-white/70 font-medium">${s.name}</span><span class="text-white/30">${label} · ${m}m${sec}s</span></div>`;
       }).join('');
-      const moreBtn = h.length > 3 ? `<button id="vc-btn-ver-mas" class="w-full mt-2 text-[9px] text-amber-500/80 hover:text-amber-400 font-bold uppercase tracking-wider py-1 border border-white/5 rounded-md bg-white/5 hover:bg-white/10 transition-colors">${_t('vc_hist_more')}</button>` : '';
-      return `<div class="relative z-10 px-5 pb-4 pt-2 bg-zinc-900/30 backdrop-blur-md border-t border-white/5"><div class="text-[9px] text-white/30 font-bold uppercase tracking-[0.15em] mb-1.5">${_t('hist_title')}</div>${rows}${moreBtn}</div>`;
+      const moreBtn = h.length > 3 ? `<button id="vc-btn-ver-mas" class="w-full mt-2 text-xs opacity-80 text-amber-500/80 hover:text-amber-400 font-bold uppercase tracking-wider py-1 border border-white/5 rounded-md bg-white/5 hover:bg-white/10 transition-colors">${_t('vc_hist_more')}</button>` : '';
+      return `<div class="relative z-10 px-5 pb-4 pt-2 bg-zinc-900/30 backdrop-blur-md border-t border-white/5"><div class="text-xs opacity-80 text-white/30 font-bold uppercase tracking-[0.15em] mb-1.5">${_t('hist_title')}</div>${rows}${moreBtn}</div>`;
     }
 
     _showDetailedHistory() {
@@ -1152,7 +1152,7 @@
           <div class="flex justify-between items-center p-4 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors">
             <div>
               <div class="text-white font-bold text-sm mb-1">${s.name}</div>
-              <div class="text-white/40 text-[11px] capitalize">${label}</div>
+              <div class="text-white/40 text-sm opacity-90 capitalize">${label}</div>
             </div>
             <div class="text-amber-400 font-medium text-xs bg-amber-400/10 px-3 py-1.5 rounded-lg border border-amber-400/20">
               ${m}m ${sec}s
@@ -1205,8 +1205,8 @@
           ? `<img src="${u.photoURL || window.yaireCurrentUser?.photoURL}" class="w-full h-full rounded-full object-cover" draggable="false" referrerpolicy="no-referrer" />` 
           : initials;
 
-        const micIcon = isMuted ? `<span class="text-red-500 w-4 h-4 vc-mico">${ICONS.micOff}</span>` : '';
-        const bellIcon = isDnd ? `<span class="text-purple-400 w-4 h-4 vc-dico" title="DND">${ICONS.dnd}</span>` : '';
+        const micIcon = isMuted ? `<span class="text-red-500 w-6 h-6 vc-mico">${ICONS.micOff}</span>` : '';
+        const bellIcon = isDnd ? `<span class="text-purple-400 w-6 h-6 vc-dico" title="DND">${ICONS.dnd}</span>` : '';
 
         return `
           <div class="flex items-center gap-3 p-2 hover:bg-white/5 rounded-xl transition-colors vc-user group" id="vc-u-${u.id}">
@@ -1214,7 +1214,7 @@
               ${avatarHtml}
             </div>
             <div class="flex-1 min-w-0">
-              <div class="text-white text-sm font-medium truncate">${u.displayName} ${isMe ? `<span class="text-white/30 text-[10px] ml-1 px-1.5 py-0.5 rounded-md bg-white/10">${_t('tag_you')}</span>` : ''}</div>
+              <div class="text-white text-sm font-medium truncate">${u.displayName} ${isMe ? `<span class="text-white/30 text-xs ml-1 px-1.5 py-0.5 rounded-md bg-white/10">${_t('tag_you')}</span>` : ''}</div>
             </div>
             <div class="flex items-center gap-2 pr-1 opacity-100 vc-icons-container">
                ${bellIcon}${micIcon}
@@ -1234,7 +1234,7 @@
             <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center relative overflow-hidden [&>svg]:w-5 [&>svg]:h-5 [&>svg]:relative [&>svg]:z-10">${ICONS.sound}</div>
             <div>
               <div class="text-white font-bold text-sm">#principal</div>
-              <div class="text-white/40 text-[11px] flex items-center gap-1.5 vc-sub">
+              <div class="text-white/40 text-sm opacity-90 flex items-center gap-1.5 vc-sub">
                 <div class="w-1.5 h-1.5 rounded-full bg-green-500" style="animation: vc-blink 2s infinite"></div>
                 ${this.users.length}/4 · <span id="vc-timer" class="tabular-nums font-mono vc-timer">00:00</span>
               </div>
@@ -1242,14 +1242,14 @@
           </div>
           <div class="flex items-center gap-1">
             <button class="text-white/30 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors" id="vc-tab-config" title="Configuración">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
             </button>
             <button class="text-white/30 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors" id="vc-close">✕</button>
           </div>
         </div>
 
         <!-- Navigation Tabs -->
-        <div class="flex items-center px-2 py-1 mx-5 mt-2 bg-black/40 rounded-lg p-1 overflow-x-auto vc-scroll hide-scrollbar gap-1">
+        <div class="flex items-center px-3 py-2 mx-5 mt-2 bg-black/40 rounded-lg p-1 overflow-x-auto vc-scroll hide-scrollbar gap-1">
           <button class="min-w-[70px] flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${isRoom ? 'bg-zinc-800 text-white shadow-md' : 'text-white/40 hover:text-white/80'}" id="vc-tab-room">
              ${_t('vc_tab_room')}
           </button>
@@ -1266,7 +1266,7 @@
           <!-- ROOM TAB -->
           <div class="absolute inset-0 flex flex-col ${isRoom ? 'opacity-100 translate-x-0 pointer-events-auto' : 'opacity-0 -translate-x-8 pointer-events-none'}" id="vc-content-room">
             <div class="flex-1 overflow-y-auto px-4 py-2 vc-scroll vc-sect">
-              <div class="text-[10px] text-white/30 font-bold uppercase tracking-wider mb-2 px-2 mt-2 vc-sect-lbl">${_t('sect_in')}</div>
+              <div class="text-xs text-white/30 font-bold uppercase tracking-wider mb-2 px-2 mt-2 vc-sect-lbl">${_t('sect_in')}</div>
               ${userRows || `<div class="text-center text-white/20 text-xs py-8 vc-empty">${_t('empty_chan')}</div>`}
             </div>
           </div>
@@ -1274,11 +1274,11 @@
           <!-- CHAT TAB -->
           <div class="absolute inset-0 flex flex-col ${isChat ? 'opacity-100 translate-x-0 pointer-events-auto' : (isRoom ? 'opacity-0 translate-x-8 pointer-events-none' : 'opacity-0 -translate-x-8 pointer-events-none')}" id="vc-content-chat">
             <div class="flex-1 overflow-y-auto px-4 pt-2 pb-1 vc-scroll" id="vc-msgs">${this._renderChatMsgs()}</div>
-            <div class="px-4 pb-2 text-amber-500/80 text-[10px] hidden" id="vc-chat-typing"></div>
+            <div class="px-4 pb-2 text-amber-500/80 text-xs hidden" id="vc-chat-typing"></div>
             <div class="p-3 border-t border-white/5 flex gap-2">
               <input class="flex-1 bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white text-xs outline-none focus:border-amber-500/50 transition-colors" id="vc-chat-in" type="text" placeholder="${_t('vc_chat_ph')}" autocomplete="off"/>
               <button class="bg-amber-500 text-black w-10 h-10 rounded-xl flex items-center justify-center hover:bg-amber-400 transition-colors shadow-lg" id="vc-chat-send">
-                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
               </button>
             </div>
           </div>
@@ -1295,11 +1295,11 @@
         <!-- Global Controls -->
         <div class="flex gap-2 p-4 border-t border-white/5 bg-zinc-900/50">
           <button class="flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${this.muted ? 'bg-red-500/10 text-red-500 border border-red-500/30' : 'bg-white/5 text-white/70 border border-white/10 hover:bg-white/10 hover:text-white'}" id="vc-mute">
-            <span class="w-4 h-4 [&>svg]:w-4 [&>svg]:h-4 flex items-center justify-center">${this.muted ? ICONS.micOff : ICONS.mic}</span>
+            <span class="w-6 h-6 [&>svg]:w-4 [&>svg]:h-4 flex items-center justify-center">${this.muted ? ICONS.micOff : ICONS.mic}</span>
             ${this.muted ? _t('btn_muted') : _t('btn_mic')}
           </button>
           <button class="flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${this.dnd ? 'bg-purple-500/10 text-purple-400 border border-purple-500/30' : 'bg-white/5 text-white/70 border border-white/10 hover:bg-white/10 hover:text-white'}" id="vc-dnd">
-            <span class="w-4 h-4 [&>svg]:w-4 [&>svg]:h-4 flex items-center justify-center">${ICONS.bell}</span> DND
+            <span class="w-6 h-6 [&>svg]:w-4 [&>svg]:h-4 flex items-center justify-center">${ICONS.bell}</span> DND
           </button>
           <button class="w-[46px] flex-shrink-0 rounded-xl bg-red-500/10 text-red-500 border border-red-500/20 flex items-center justify-center hover:bg-red-500/20 transition-all [&>svg]:w-4 [&>svg]:h-4" id="vc-leave" title="Salir">
             ${ICONS.phone}
@@ -1363,7 +1363,7 @@
               ${avatarHtml}
             </div>
             <div class="flex-1 min-w-0">
-              <div class="text-white text-sm font-medium truncate">${u.displayName} ${isMe ? `<span class="text-white/30 text-[10px] ml-1 px-1.5 py-0.5 rounded-md bg-white/10">${_t('tag_you')}</span>` : ''}</div>
+              <div class="text-white text-sm font-medium truncate">${u.displayName} ${isMe ? `<span class="text-white/30 text-xs ml-1 px-1.5 py-0.5 rounded-md bg-white/10">${_t('tag_you')}</span>` : ''}</div>
             </div>
             <div class="flex items-center gap-2 pr-1 opacity-100 vc-icons-container">
             </div>
@@ -1395,10 +1395,10 @@
               
               menu.innerHTML = `
                 <div class="px-3 py-1.5 mb-1 border-b border-white/10">
-                  <div class="text-[10px] uppercase font-bold text-white/40 tracking-wider">${u.displayName}</div>
+                  <div class="text-xs uppercase font-bold text-white/40 tracking-wider">${u.displayName}</div>
                 </div>
                 <button class="w-full text-left px-3 py-2 rounded-lg text-sm text-white/90 hover:bg-white/10 hover:text-white transition-colors flex items-center gap-2">
-                  <span class="w-4 h-4 flex items-center justify-center ${isLocallyMuted ? 'text-green-400' : 'text-red-400'}">${isLocallyMuted ? ICONS.mic : ICONS.micOff}</span>
+                  <span class="w-6 h-6 flex items-center justify-center ${isLocallyMuted ? 'text-green-400' : 'text-red-400'}">${isLocallyMuted ? ICONS.mic : ICONS.micOff}</span>
                   ${isLocallyMuted ? 'Desmutear localmente' : 'Silenciar localmente'}
                 </button>
               `;
@@ -1447,15 +1447,15 @@
         const existingDnd = iconContainer.querySelector('.vc-dico');
         if (isDnd && !existingDnd) {
           const mico = iconContainer.querySelector('.vc-mico');
-          if (mico) mico.insertAdjacentHTML('beforebegin', `<span class="text-purple-400 w-4 h-4 vc-dico" title="${_t('btn_dnd')}">${ICONS.dnd}</span>`);
-          else iconContainer.insertAdjacentHTML('beforeend', `<span class="text-purple-400 w-4 h-4 vc-dico" title="${_t('btn_dnd')}">${ICONS.dnd}</span>`);
+          if (mico) mico.insertAdjacentHTML('beforebegin', `<span class="text-purple-400 w-6 h-6 vc-dico" title="${_t('btn_dnd')}">${ICONS.dnd}</span>`);
+          else iconContainer.insertAdjacentHTML('beforeend', `<span class="text-purple-400 w-6 h-6 vc-dico" title="${_t('btn_dnd')}">${ICONS.dnd}</span>`);
         } else if (!isDnd && existingDnd) {
           existingDnd.remove();
         }
         
         const existingMic = iconContainer.querySelector('.vc-mico');
         if ((isMuted || u.localMuted) && !existingMic) {
-          iconContainer.insertAdjacentHTML('beforeend', `<span class="text-red-500 w-4 h-4 vc-mico" title="${u.localMuted ? 'Silenciado localmente' : 'Silenciado'}">${ICONS.micOff}</span>`);
+          iconContainer.insertAdjacentHTML('beforeend', `<span class="text-red-500 w-6 h-6 vc-mico" title="${u.localMuted ? 'Silenciado localmente' : 'Silenciado'}">${ICONS.micOff}</span>`);
         } else if (!isMuted && !u.localMuted && existingMic) {
           existingMic.remove();
         } else if ((isMuted || u.localMuted) && existingMic) {
@@ -2109,7 +2109,7 @@
       const btn = document.getElementById('vc-mute');
       if (btn) {
         btn.className = `flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${this.muted ? 'bg-red-500/10 text-red-500 border border-red-500/30' : 'bg-white/5 text-white/70 border border-white/10 hover:bg-white/10 hover:text-white'}`;
-        btn.innerHTML = `<span class="w-4 h-4 [&>svg]:w-4 [&>svg]:h-4 flex items-center justify-center">${this.muted ? ICONS.micOff : ICONS.mic}</span> ${this.muted ? _t('btn_muted') : _t('btn_mic')}`;
+        btn.innerHTML = `<span class="w-6 h-6 [&>svg]:w-4 [&>svg]:h-4 flex items-center justify-center">${this.muted ? ICONS.micOff : ICONS.mic}</span> ${this.muted ? _t('btn_muted') : _t('btn_mic')}`;
         const svg = btn.querySelector('svg');
         if (svg) {
           svg.style.transform = 'scale(1.3)';
@@ -2135,7 +2135,7 @@
       const btn = document.getElementById('vc-dnd');
       if (btn) {
         btn.className = `flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${this.dnd ? 'bg-purple-500/10 text-purple-400 border border-purple-500/30' : 'bg-white/5 text-white/70 border border-white/10 hover:bg-white/10 hover:text-white'}`;
-        btn.innerHTML = `<span class="w-4 h-4 [&>svg]:w-4 [&>svg]:h-4 flex items-center justify-center">${ICONS.bell}</span> DND`;
+        btn.innerHTML = `<span class="w-6 h-6 [&>svg]:w-4 [&>svg]:h-4 flex items-center justify-center">${ICONS.bell}</span> DND`;
         const svg = btn.querySelector('svg');
         if (svg) {
           svg.style.transform = 'scale(1.2) rotate(-15deg)';
@@ -2184,8 +2184,8 @@
           html += `
           <div class="flex flex-col mb-3 ${isMe ? 'items-end' : 'items-start'} vc-chat-msg" data-from="${m.from}">
             <div class="flex items-baseline gap-2 mb-1 px-1">
-              <span class="text-[10px] font-bold ${isMe ? 'text-amber-500' : 'text-white/60'}">${m.name}</span>
-              <span class="text-[9px] text-white/30">${time}</span>
+              <span class="text-xs font-bold ${isMe ? 'text-amber-500' : 'text-white/60'}">${m.name}</span>
+              <span class="text-xs opacity-80 text-white/30">${time}</span>
             </div>
             <div class="flex flex-col gap-1 w-full ${isMe ? 'items-end' : 'items-start'} vc-chat-bubbles">
               <div class="max-w-[85%] ${bubbleClass}">${escText}</div>`;
@@ -2274,8 +2274,8 @@
           msgsEl.insertAdjacentHTML('beforeend', `
             <div class="flex flex-col mb-3 ${isMe ? 'items-end' : 'items-start'} vc-chat-msg" data-from="${from}">
               <div class="flex items-baseline gap-2 mb-1 px-1">
-                <span class="text-[10px] font-bold ${isMe ? 'text-amber-500' : 'text-white/60'}">${name}</span>
-                <span class="text-[9px] text-white/30">${time}</span>
+                <span class="text-xs font-bold ${isMe ? 'text-amber-500' : 'text-white/60'}">${name}</span>
+                <span class="text-xs opacity-80 text-white/30">${time}</span>
               </div>
               <div class="flex flex-col gap-1 w-full ${isMe ? 'items-end' : 'items-start'} vc-chat-bubbles">
                 <div class="max-w-[85%] ${bubbleClass}">${escText}</div>
@@ -2580,7 +2580,7 @@
 
         const eqBars = isPlaying
           ? `<div class="flex items-end gap-0.5 h-3"><div class="w-0.5 bg-amber-500 rounded-full animate-[vc-eq_0.8s_ease-in-out_infinite]"></div><div class="w-0.5 bg-amber-500 rounded-full animate-[vc-eq_0.8s_ease-in-out_infinite_0.2s]"></div><div class="w-0.5 bg-amber-500 rounded-full animate-[vc-eq_0.8s_ease-in-out_infinite_0.4s]"></div></div>`
-          : `<span class="w-4 h-4 text-white/40 [&>svg]:w-4 [&>svg]:h-4 flex items-center justify-center">${ICONS.sound || '♪'}</span>`;
+          : `<span class="w-6 h-6 text-white/40 [&>svg]:w-4 [&>svg]:h-4 flex items-center justify-center">${ICONS.sound || '♪'}</span>`;
         nowPlaying = `
           <div class="bg-white/5 border border-white/10 rounded-xl p-3 mb-2 relative overflow-hidden">
             <div class="flex items-center gap-3 relative z-10 mb-2">
@@ -2588,7 +2588,7 @@
                 ${eqBars}
               </div>
               <div class="flex-1 min-w-0">
-                <div class="text-[9px] text-amber-500 font-bold uppercase tracking-wider mb-0.5">${_t('vc_music_now')}</div>
+                <div class="text-xs opacity-80 text-amber-500 font-bold uppercase tracking-wider mb-0.5">${_t('vc_music_now')}</div>
                 ${this._cleanMusicTitle(track.title).length > 25 
                   ? `<div class="vc-marquee-container text-sm font-bold text-white">
                        <div class="vc-marquee-content">${this._escHtml(this._cleanMusicTitle(track.title))}</div>
@@ -2596,9 +2596,9 @@
                      </div>` 
                   : `<div class="text-sm font-bold text-white truncate">${this._escHtml(this._cleanMusicTitle(track.title))}</div>`
                 }
-                <div class="text-[10px] text-white/40 truncate">${track.addedByName ? `${_t('vc_music_by')} ${track.addedByName}` : ''}</div>
+                <div class="text-xs text-white/40 truncate">${track.addedByName ? `${_t('vc_music_by')} ${track.addedByName}` : ''}</div>
               </div>
-              <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-white/10 text-white/50">${(track.source || track.type) === 'youtube' ? 'YT' : 'SP'}</span>
+              <span class="text-xs opacity-80 font-bold px-1.5 py-0.5 rounded bg-white/10 text-white/50">${(track.source || track.type) === 'youtube' ? 'YT' : 'SP'}</span>
             </div>
             
             ${track.type === 'youtube' ? `
@@ -2606,7 +2606,7 @@
                 <div class="h-1 bg-black/50 rounded-full overflow-hidden relative" id="vc-music-progress">
                   <div class="absolute top-0 left-0 h-full bg-amber-500 transition-all duration-200" id="vc-music-progress-fill" style="width: ${currentPct}%"></div>
                 </div>
-                <div class="flex justify-between text-[9px] text-white/40 mt-1 font-mono">
+                <div class="flex justify-between text-xs opacity-80 text-white/40 mt-1 font-mono">
                   <span id="vc-music-time-current">${cTimeFmt}</span>
                   <span id="vc-music-time-total">${tTimeFmt}</span>
                 </div>
@@ -2639,12 +2639,12 @@
             const isCur = i === this._musicState.currentIndex;
             return `
             <div class="flex items-center gap-3 p-2 rounded-lg transition-colors ${isCur ? 'bg-amber-500/10 border border-amber-500/20' : 'hover:bg-white/5'}">
-              <span class="w-4 text-center text-[10px] font-bold ${isCur ? 'text-amber-500' : 'text-white/30'}">${isCur && this._musicPlaying ? '♪' : (i + 1)}</span>
+              <span class="w-4 text-center text-xs font-bold ${isCur ? 'text-amber-500' : 'text-white/30'}">${isCur && this._musicPlaying ? '♪' : (i + 1)}</span>
               <div class="flex-1 min-w-0">
                 <div class="text-xs font-medium text-white truncate ${isCur ? 'text-amber-500' : ''}">${this._escHtml(this._cleanMusicTitle(t.title))}</div>
-                <div class="text-[10px] text-white/30 truncate">${t.addedByName || ''}</div>
+                <div class="text-xs text-white/30 truncate">${t.addedByName || ''}</div>
               </div>
-              <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-white/10 text-white/30">${(t.source || t.type) === 'youtube' ? 'YT' : 'SP'}</span>
+              <span class="text-xs opacity-80 font-bold px-1.5 py-0.5 rounded bg-white/10 text-white/30">${(t.source || t.type) === 'youtube' ? 'YT' : 'SP'}</span>
               ${!isCur ? `<button class="vc-music-track-rm w-6 h-6 flex items-center justify-center text-white/20 hover:text-red-400 hover:bg-red-400/10 rounded transition-colors [&>svg]:w-3 [&>svg]:h-3" data-track-id="${t.id}">${ICONS.trash}</button>` : ''}
             </div>`;
           }).join('')
@@ -2653,7 +2653,7 @@
       return `
         <div class="p-3 flex-1 flex flex-col">
           ${nowPlaying}
-          <div class="text-[10px] text-white/30 font-bold uppercase tracking-wider mb-1 px-1">${_t('vc_music_queue')} ${this._musicQueue.length > 0 ? `(${this._musicQueue.length})` : ''}</div>
+          <div class="text-xs text-white/30 font-bold uppercase tracking-wider mb-1 px-1">${_t('vc_music_queue')} ${this._musicQueue.length > 0 ? `(${this._musicQueue.length})` : ''}</div>
           <div class="flex flex-col gap-1 mb-2" id="vc-music-queue">${queueItems}</div>
           <div class="mt-auto pt-2">
             <div class="text-red-500 text-xs text-center mb-1 min-h-[16px]" id="vc-music-err"></div>

@@ -3193,8 +3193,8 @@
         if (!this.panel.classList.contains('open') && this.connected) {
           this._bar.classList.add('show');
         }
-        // Update Foreground Service notification every minute
-        if (s > 0 && s % 60 === 0) {
+        // Update Foreground Service notification every second
+        if (s > 0) {
           this._updateForegroundService(str);
         }
       }, 1000);

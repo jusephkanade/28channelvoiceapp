@@ -876,12 +876,14 @@
       this.sidebar.className = 'fixed inset-0 z-[10002] bg-black/80 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300 flex justify-end';
       this.sidebar.innerHTML = `
         <div class="w-80 max-w-[80vw] h-full bg-zinc-950 border-l border-white/10 shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col" id="vc-sidebar-panel">
-            <div class="px-5 py-4 border-b border-white/10 flex items-center justify-between bg-zinc-900/50">
+            <div class="px-5 pt-12 pb-4 border-b border-white/10 flex items-center justify-between bg-zinc-900/50">
                 <div class="flex items-center gap-2 text-amber-500">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                     <span class="font-bold tracking-widest uppercase text-sm">Menú</span>
                 </div>
-                <button id="vc-sidebar-close" class="text-white/50 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg p-1.5 transition-colors">✕</button>
+                <button id="vc-sidebar-close" class="text-white/50 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg p-1.5 transition-colors">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
             </div>
             <div class="flex-1 overflow-y-auto" id="vc-sidebar-body">
             </div>
@@ -932,6 +934,32 @@
       document.body.appendChild(this._bar);
 
       this.panel.addEventListener('click', (e) => e.stopPropagation());
+
+      // SWIPE TO MINIMIZE
+      let _startY = 0;
+      let _isSwiping = false;
+      this.panel.addEventListener('touchstart', (e) => {
+        const rect = this.panel.getBoundingClientRect();
+        if (e.touches[0].clientY - rect.top < 100) {
+            _startY = e.touches[0].clientY;
+            _isSwiping = true;
+        } else {
+            _isSwiping = false;
+        }
+      }, { passive: true });
+      this.panel.addEventListener('touchmove', (e) => {
+        if (!_isSwiping) return;
+        const currentY = e.touches[0].clientY;
+        const deltaY = currentY - _startY;
+        
+        if (deltaY > 50) {
+            _isSwiping = false;
+            if (this.panel.classList.contains('scale-100')) {
+                this._toggle();
+            }
+        }
+      }, { passive: true });
+      this.panel.addEventListener('touchend', () => { _isSwiping = false; });
 
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
@@ -1013,7 +1041,7 @@
         
         // Re-bind ver mas inside sidebar
         const verMas = document.getElementById('vc-btn-ver-mas');
-        if(verMas) verMas.onclick = () => { this._toggleSidebar(); this._showHistoryModal(); };
+        if(verMas) verMas.onclick = () => { this._toggleSidebar(); this._showDetailedHistory(); };
 
         this.sidebar.classList.remove('opacity-0', 'pointer-events-none');
         this.sidebar.querySelector('#vc-sidebar-panel').classList.remove('translate-x-full');

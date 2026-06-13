@@ -3270,6 +3270,11 @@
         let perm = await fs.checkPermissions();
         if (perm.display !== 'granted') {
           perm = await fs.requestPermissions();
+          // [CRÍTICO]: En Android 14, si iniciamos un ForegroundService exactamente en el milisegundo 
+          // en el que se cierra el diálogo de permisos, Android piensa que la app está en "background" 
+          // (porque el diálogo acaba de quitarse) y crashea la app entera con ForegroundServiceStartNotAllowedException.
+          // Esperamos 500ms para asegurar que la Activity vuelva completamente a estar "Resumed" y en "Foreground".
+          await new Promise(resolve => setTimeout(resolve, 500));
         }
         
         await fs.startForegroundService({

@@ -59,7 +59,7 @@ jobs:
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: 28E-Voice-App.apk
+          name: 28E-Oracle.apk
           path: android/app/build/outputs/apk/release/app-release.apk
 
       - name: Create or Update Latest Release

@@ -1,211 +1,413 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="dark select-none">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>28E Voice</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://28channelvoice-default-rtdb.firebaseio.com" crossorigin>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    /* Aumentar escala base global para móviles (Tailwind rem scaling) */
-    html {
-      font-size: 17px; /* Base por defecto es 16px. 17px = ~6% más grande */
-    }
+  <meta name="theme-color" content="#050507" />
+  <title>28E Oracle</title>
+  <meta name="description" content="28E Oracle Mobile — Sala inmersiva de videollamadas P2P y sincronización multimedia." />
+  <link rel="icon" type="image/x-icon" href="tulip.ico?v=3" />
 
-    /* Prevent text selection and pull-to-refresh on mobile */
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', '-apple-system', 'system-ui', 'sans-serif'] },
+          colors: {
+            oracle: {
+              50: '#fffbeb', 100: '#fef3c7', 200: '#fde68a',
+              400: '#fbbf24', 500: '#f59e0b', 600: '#d97706',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+  <script src="https://www.youtube.com/iframe_api"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html { font-size: 16px; }
     body {
       margin: 0;
       padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      background: #050507;
+      color: #ffffff;
+      font-family: 'Inter', sans-serif;
       overflow: hidden;
-      user-select: none;
-      -webkit-user-select: none;
-      -webkit-touch-callout: none;
-      background-color: #000;
-      color: #fff;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-
-    /* Mobile specific adjustments */
-    #app-container {
-      position: absolute;
-      top: 0;
-      left: 0;
       width: 100vw;
       height: 100vh;
       display: flex;
       flex-direction: column;
     }
 
-    /* We will use the same ID structure to make porting voice-channel-widget.js easier */
-    #vc-widget {
+    /* ═══ GLASS SYSTEM ═══ */
+    .glass {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(35px) saturate(130%);
+      -webkit-backdrop-filter: blur(35px) saturate(130%);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+    .glass-light {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .glass-heavy {
+      background: rgba(8, 8, 12, 0.85);
+      backdrop-filter: blur(50px) saturate(160%);
+      -webkit-backdrop-filter: blur(50px) saturate(160%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-input {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 9999px;
+      color: #fff;
+    }
+    .glass-input:focus {
+      outline: none;
+      border-color: rgba(245, 158, 11, 0.6);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    /* ═══ VIDEO GRID DYNAMICS ═══ */
+    .video-grid {
+      display: grid;
+      gap: 0.5rem;
       width: 100%;
       height: 100%;
+      padding: 0.5rem;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .video-grid.grid-1 { grid-template-columns: 1fr; grid-template-rows: 1fr; }
+    .video-grid.grid-2 { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+    .video-grid.grid-3 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+    .video-grid.grid-3 > div:first-child { grid-column: span 2; }
+    .video-grid.grid-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+    .video-grid.grid-many { grid-template-columns: repeat(2, 1fr); auto-rows: 180px; overflow-y: auto; }
+
+    .video-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 1.25rem;
+      overflow: hidden;
+      background: rgba(15, 15, 22, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.07);
       display: flex;
-      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
     }
-    
-    .vc-glass {
-      background: rgba(20, 20, 20, 0.85);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+    .video-container video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 0.3s ease;
     }
-    
-    /* Completely hide the floating action button and the bottom bar */
-    #vc-fab, #vc-bar { 
-      display: none !important; 
+    .video-container.has-video video { opacity: 1; }
+    .video-container.has-video .avatar-fallback { opacity: 0; pointer-events: none; }
+
+    .avatar-fallback {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at center, rgba(245,158,11,0.08) 0%, transparent 70%);
+      transition: opacity 0.3s ease;
     }
-    
-    /* Force the panel to be full screen, always visible, without rounded corners */
-    #vc-panel {
-      opacity: 1 !important;
-      transform: scale(1) translateY(0) !important;
-      pointer-events: auto !important;
-      border-radius: 0 !important;
-      border: none !important;
-      position: fixed !important;
-      inset: 0 !important;
-      width: 100% !important;
-      height: 100% !important;
-      background-color: #09090b !important;
+
+    .video-overlay-info {
+      position: absolute;
+      bottom: 0.6rem;
+      left: 0.6rem;
+      right: 0.6rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      pointer-events: none;
+      z-index: 10;
     }
-    
-    /* Hide the X close button as this is a full-screen app */
-    #vc-close {
-      display: none !important;
+
+    /* Speaking animation */
+    @keyframes pulse-amber {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5); border-color: rgba(245, 158, 11, 0.8); }
+      50% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); border-color: rgba(245, 158, 11, 1); }
     }
-    
-    /* Hide scrollbars but allow scrolling */
-    ::-webkit-scrollbar { 
-      width: 0px; 
-      background: transparent; 
+    .video-container.speaking {
+      animation: pulse-amber 1.5s infinite;
     }
+
+    /* Speak bars */
+    .speak-bars { display: flex; align-items: flex-end; gap: 2px; height: 12px; }
+    .speak-bars .bar { width: 3px; background: #f59e0b; border-radius: 2px; transition: height 0.1s ease; opacity: 0.3; }
+    .speak-bars.active .bar { opacity: 1; animation: bounce-bar 0.4s infinite alternate ease-in-out; }
+    .speak-bars.active .bar:nth-child(2) { animation-delay: 0.1s; }
+    .speak-bars.active .bar:nth-child(3) { animation-delay: 0.2s; }
+    @keyframes bounce-bar { 0% { height: 3px; } 100% { height: 12px; } }
+
+    /* Bottom Sheets */
+    .drawer-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
+      z-index: 40; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+    }
+    .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
+
+    .bottom-drawer {
+      position: fixed; left: 0; right: 0; bottom: 0; max-height: 85vh;
+      background: #0a0a0f; border-top: 1px solid rgba(255,255,255,0.1);
+      border-radius: 1.75rem 1.75rem 0 0; z-index: 50;
+      transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex; flex-direction: column;
+    }
+    .bottom-drawer.open { transform: translateY(0); }
+
+    /* Custom scrollbars */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
   </style>
 </head>
-<body class="bg-black text-white antialiased">
-  <div id="app-container">
-    <div id="vc-root" class="w-full h-full">
-      <!-- The voice channel widget UI will be injected here by main.js -->
+<body class="relative bg-[#050507]">
+
+  <!-- ═══ INITIAL LOADER ═══ -->
+  <div id="initial-loader" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#050507] transition-all duration-500">
+    <div class="relative flex items-center justify-center mb-6">
+      <div class="w-16 h-16 rounded-full border-2 border-amber-500/20 border-t-amber-500 animate-spin"></div>
+      <span class="absolute text-2xl animate-pulse">🌷</span>
     </div>
-    <!-- ═══ LOADER ORIGINAL DE 28E MAIN ═══ -->
-    <div id="initial-loader"
-        style="position:fixed;inset:0;z-index:200000;background:#050505;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;will-change:transform,opacity;">
+    <h1 class="text-xl font-extrabold tracking-wider bg-gradient-to-r from-amber-400 via-orange-400 to-rose-500 bg-clip-text text-transparent">28E ORACLE</h1>
+    <p class="text-xs text-zinc-500 mt-2 font-medium">Sincronizando frecuencias nativas...</p>
+  </div>
 
-        <!-- Ambient glow -->
-        <div class="loader-glow loader-glow-1"></div>
-        <div class="loader-glow loader-glow-2"></div>
+  <!-- ═══ LOBBY SCREEN ═══ -->
+  <div id="lobby-screen" class="absolute inset-0 z-30 flex flex-col justify-between p-6 overflow-y-auto hidden">
+    <!-- Header -->
+    <div class="flex items-center justify-between pt-2">
+      <div class="flex items-center gap-2">
+        <span class="text-xl font-bold bg-gradient-to-r from-amber-400 to-rose-500 bg-clip-text text-transparent">🌷 Oracle</span>
+        <span class="px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase bg-amber-500/10 text-amber-400 rounded-full border border-amber-500/20">Mobile</span>
+      </div>
+      <button id="lobby-handle-btn" class="px-3 py-1.5 rounded-full glass text-xs font-semibold text-zinc-300 hover:text-white flex items-center gap-1.5">
+        <span id="lobby-handle-display">@handle</span>
+        <svg class="w-3 h-3 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </button>
+    </div>
 
-        <!-- Logo -->
-        <div id="loader-logo"
-            style="position:relative;z-index:10;opacity:0;margin-bottom:2rem;text-align:center;animation:ldFadeUp 0.7s cubic-bezier(0.22,1,0.36,1) 0.15s forwards;">
-            <span
-                style="font-family:sans-serif;font-weight:900;font-size:2.6rem;letter-spacing:-0.06em;color:#fff;line-height:1;">28E</span>
+    <!-- Main Card -->
+    <div class="my-auto max-w-sm mx-auto w-full glass rounded-3xl p-6 relative overflow-hidden shadow-2xl border border-white/10">
+      <div class="absolute -top-24 -right-24 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="text-center mb-6">
+        <h2 class="text-2xl font-black tracking-tight text-white mb-1">Sala Inmersiva</h2>
+        <p class="text-xs text-zinc-400">Audio de baja latencia P2P & sincronización musical</p>
+      </div>
+
+      <!-- Cam/Mic Preview -->
+      <div class="relative w-full aspect-video rounded-2xl overflow-hidden bg-zinc-950 mb-6 border border-white/10 flex items-center justify-center shadow-inner">
+        <video id="lobby-cam-video" autoplay playsinline muted class="w-full h-full object-cover transform -scale-x-100 hidden"></video>
+        <div id="lobby-cam-placeholder" class="flex flex-col items-center justify-center text-zinc-600 gap-2">
+          <div class="w-12 h-12 rounded-full glass-light flex items-center justify-center">
+            <svg class="w-6 h-6 text-zinc-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+          </div>
+          <span class="text-[11px]">Vista previa de cámara desactivada</span>
         </div>
 
-        <!-- Sphere + Progress Ring -->
-        <div id="custom-loader-wrapper"
-            style="position:relative;z-index:10;display:flex;align-items:center;justify-content:center;width:220px;height:220px;opacity:0;animation:ldScaleIn 0.8s cubic-bezier(0.22,1,0.36,1) 0.3s forwards;">
-
-            <!-- SVG Progress Ring -->
-            <svg width="220" height="220" viewBox="0 0 220 220" style="position:absolute;inset:0;z-index:2;">
-                <circle cx="110" cy="110" r="104" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1" />
-                <circle id="loader-ring-fill" cx="110" cy="110" r="104" fill="none" stroke="url(#ld-ring-grad)"
-                    stroke-width="1.5" stroke-linecap="round" stroke-dasharray="653.45" stroke-dashoffset="653.45"
-                    transform="rotate(-90 110 110)"
-                    style="transition:stroke-dashoffset 0.5s cubic-bezier(0.4,0,0.2,1);" />
-                <defs>
-                    <linearGradient id="ld-ring-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.7" />
-                        <stop offset="100%" stop-color="#ec4899" stop-opacity="0.7" />
-                    </linearGradient>
-                </defs>
-            </svg>
-
-            <!-- The Sphere -->
-            <div style="position:relative;width:180px;height:180px;border-radius:50%;user-select:none;">
-                <div class="loader-circle-bg"></div>
-            </div>
-
-            <!-- Sphere shadow (ground reflection) -->
-            <div
-                style="position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:100px;height:14px;background:radial-gradient(ellipse,rgba(236,72,153,0.12) 0%,transparent 70%);border-radius:50%;pointer-events:none;z-index:0;">
-            </div>
+        <!-- Controls preview -->
+        <div class="absolute bottom-3 left-0 right-0 flex justify-center gap-3">
+          <button id="lobby-btn-mic" class="w-10 h-10 rounded-full glass-heavy flex items-center justify-center text-white hover:scale-105 active:scale-95 transition-all">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          </button>
+          <button id="lobby-btn-cam" class="w-10 h-10 rounded-full glass-heavy flex items-center justify-center text-rose-500 hover:scale-105 active:scale-95 transition-all muted">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="1" y1="1" x2="23" y2="23"/><path d="M21 21H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3m3-3h6l2 3h4a2 2 0 0 1 2 2v9.34m-7.72-2.06a4 4 0 1 1-5.56-5.56"/></svg>
+          </button>
         </div>
+      </div>
 
-        <!-- Footer -->
-        <div id="loader-footer"
-            style="position:absolute;bottom:2rem;left:0;right:0;z-index:15;text-align:center;opacity:0;animation:ldFadeIn 0.4s ease 0.7s forwards;color:rgba(255,255,255,0.3);font-family:sans-serif;font-size:0.65rem;letter-spacing:0.05em;font-weight:300;pointer-events:none;">
-            Conectando universo... ✨
-        </div>
+      <!-- Auth / Enter Button -->
+      <div id="lobby-auth-section" class="flex flex-col gap-3">
+        <button id="vc-google-login-btn" class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-rose-600 text-white font-extrabold text-sm shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2.5 hover:opacity-95 active:scale-[0.98] transition-all">
+          <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12.24 10.285V14.4h6.806c-.275 1.765-2.056 5.174-6.806 5.174-4.095 0-7.439-3.389-7.439-7.574s3.345-7.574 7.439-7.574c2.33 0 3.891.989 4.785 1.849l3.254-3.138C18.189 1.186 15.479 0 12.24 0c-6.635 0-12 5.365-12 12s5.365 12 12 12c6.926 0 11.52-4.869 11.52-11.726 0-.788-.085-1.39-.189-1.989H12.24z"/></svg>
+          <span>Conectar con Google</span>
+        </button>
+        <p class="text-[10px] text-center text-zinc-500">Al unirte, el servicio de voz nativo en segundo plano se mantendrá activo.</p>
+      </div>
+    </div>
 
-        <style>
-            .loader-glow { position: absolute; border-radius: 50%; filter: blur(60px); pointer-events: none; opacity: 0.6; }
-            .loader-glow-1 { top: -20%; left: -20%; width: 60%; height: 60%; background: radial-gradient(circle, #f59e0b, transparent 70%); animation: ldPulse 6s infinite alternate ease-in-out; }
-            .loader-glow-2 { bottom: -20%; right: -20%; width: 60%; height: 60%; background: radial-gradient(circle, #ec4899, transparent 70%); animation: ldPulse 8s infinite alternate-reverse ease-in-out; }
-            
-            @keyframes ldPulse { 0% { transform: scale(0.8); opacity: 0.4; } 100% { transform: scale(1.2); opacity: 0.8; } }
-
-            .loader-circle-bg {
-                position: absolute;
-                inset: 0;
-                border-radius: 50%;
-                background-color: transparent;
-                animation: loader-rotate 2.5s linear infinite;
-            }
-
-            @keyframes loader-rotate {
-                0% {
-                    transform: rotate(90deg) translateZ(0);
-                    box-shadow:
-                        0 10px 20px 0 #fff inset,
-                        0 20px 30px 0 #f59e0b inset,
-                        0 60px 60px 0 #ec4899 inset;
-                }
-                50% {
-                    transform: rotate(270deg) translateZ(0);
-                    box-shadow:
-                        0 10px 20px 0 #fff inset,
-                        0 20px 10px 0 #ec4899 inset,
-                        0 40px 60px 0 #d97706 inset;
-                }
-                100% {
-                    transform: rotate(450deg) translateZ(0);
-                    box-shadow:
-                        0 10px 20px 0 #fff inset,
-                        0 20px 30px 0 #f59e0b inset,
-                        0 60px 60px 0 #ec4899 inset;
-                }
-            }
-            
-            @keyframes ldFadeUp {
-                from { opacity: 0; transform: translateY(15px); }
-                to { opacity: 1; transform: translateY(0); }
-            }
-            @keyframes ldScaleIn {
-                from { opacity: 0; transform: scale(0.9); }
-                to { opacity: 1; transform: scale(1); }
-            }
-            @keyframes ldFadeIn {
-                from { opacity: 0; }
-                to { opacity: 1; }
-            }
-        </style>
+    <!-- Activity History -->
+    <div class="max-w-sm mx-auto w-full mb-2">
+      <h3 class="text-[11px] font-bold tracking-wider uppercase text-zinc-500 mb-2 px-1">Frecuencia Reciente</h3>
+      <div id="lobby-history" class="glass rounded-2xl p-2 max-h-28 overflow-y-auto space-y-1.5">
+        <div class="text-xs text-white/20 text-center py-3">Cargando ecos de la sala...</div>
+      </div>
     </div>
   </div>
-  
-  <!-- We include socket.io client -->
-  <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
-  <!-- We include GSAP for smooth animations -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  
-  <script>
-    // This value is injected by GitHub Actions during the build process
-    window.APP_BUILD_DATE = "__BUILD_DATE__";
-  </script>
 
-  <script src="/voice-channel-widget.js"></script>
-  <script type="module" src="/main.js"></script>
+  <!-- ═══ ORACLE ROOM SCREEN ═══ -->
+  <div id="room-screen" class="absolute inset-0 z-20 flex flex-col hidden bg-[#050507]">
+    
+    <!-- Top Header -->
+    <div class="h-14 px-4 flex items-center justify-between shrink-0 glass border-b border-white/5 z-20">
+      <div class="flex items-center gap-2.5">
+        <span class="text-base font-black tracking-wider bg-gradient-to-r from-amber-400 to-rose-500 bg-clip-text text-transparent">ORACLE</span>
+        <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+          <div class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></div>
+          <span id="user-count-badge" class="text-[11px] font-extrabold text-emerald-400">1</span>
+        </div>
+      </div>
+
+      <!-- Music status badge -->
+      <button id="btn-music-dock" class="px-3 py-1 rounded-full glass-light text-xs font-semibold flex items-center gap-2 hover:bg-white/10 active:scale-95 transition-all">
+        <svg class="w-3.5 h-3.5 text-amber-400 animate-spin" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        <span id="music-dock-title" class="max-w-[120px] truncate text-zinc-300">Sin música</span>
+      </button>
+    </div>
+
+    <!-- Embedded YouTube Container (Collapsed/Docked) -->
+    <div id="yt-container" class="w-full shrink-0 bg-zinc-950 transition-all duration-300 border-b border-white/5 hidden overflow-hidden">
+      <div class="relative w-full aspect-video max-h-48 mx-auto">
+        <div id="yt-player" class="w-full h-full"></div>
+      </div>
+      <div class="p-2.5 flex items-center justify-between glass-heavy">
+        <span id="yt-now-playing" class="text-xs font-bold text-amber-400 truncate flex-1 pr-2">Música en Oracle</span>
+        <div class="flex items-center gap-2">
+          <button id="yt-btn-toggle" class="px-2.5 py-1 rounded-lg bg-white/10 text-[11px] font-bold">Ocultar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Video Grid Area -->
+    <div class="flex-1 min-h-0 relative overflow-hidden flex items-center justify-center p-1">
+      <div id="video-grid" class="video-grid grid-1">
+        <!-- P2P Videos injected dynamically here -->
+      </div>
+    </div>
+
+    <!-- ═══ BOTTOM CONTROL BAR (Dock) ═══ -->
+    <div class="shrink-0 p-3 pb-6 flex items-center justify-around glass-heavy border-t border-white/10 relative z-30">
+      
+      <!-- Mic -->
+      <button id="btn-mic" data-sound-click="toggleOn" class="w-12 h-12 rounded-full glass-light flex items-center justify-center text-amber-400 active:scale-90 transition-all shadow-lg shadow-amber-500/5">
+        <svg id="icon-mic-on" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        <svg id="icon-mic-off" class="w-6 h-6 hidden text-rose-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"/><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      </button>
+
+      <!-- Cam -->
+      <button id="btn-cam" data-sound-click="toggleOff" class="w-12 h-12 rounded-full glass-light flex items-center justify-center text-rose-500 active:scale-90 transition-all shadow-lg muted">
+        <svg id="icon-cam-on" class="w-6 h-6 hidden text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+        <svg id="icon-cam-off" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="1" y1="1" x2="23" y2="23"/><path d="M21 21H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3m3-3h6l2 3h4a2 2 0 0 1 2 2v9.34m-7.72-2.06a4 4 0 1 1-5.56-5.56"/></svg>
+      </button>
+
+      <!-- Chat Drawer Button -->
+      <button id="btn-chat-toggle" class="w-12 h-12 rounded-full glass-light flex items-center justify-center text-zinc-300 hover:text-white active:scale-90 transition-all relative">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span id="chat-unread-badge" class="absolute -top-1 -right-1 w-5 h-5 bg-rose-500 text-white text-[10px] font-black rounded-full flex items-center justify-center hidden">!</span>
+      </button>
+
+      <!-- People Drawer Button -->
+      <button id="btn-people-toggle" class="w-12 h-12 rounded-full glass-light flex items-center justify-center text-zinc-300 hover:text-white active:scale-90 transition-all">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </button>
+
+      <!-- Leave Room -->
+      <button id="btn-leave" class="w-12 h-12 rounded-full bg-rose-600/90 text-white flex items-center justify-center active:scale-90 hover:bg-rose-600 transition-all shadow-lg shadow-rose-600/30">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- ═══ BACKDROP FOR BOTTOM SHEETS ═══ -->
+  <div id="drawer-backdrop" class="drawer-backdrop"></div>
+
+  <!-- ═══ BOTTOM DRAWER: CHAT ═══ -->
+  <div id="chat-drawer" class="bottom-drawer p-5 pb-8">
+    <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-4 shrink-0"></div>
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-base font-extrabold flex items-center gap-2">
+        <span>💬 Frecuencias de Chat</span>
+      </h3>
+      <button id="btn-close-chat" class="p-1 text-zinc-400 hover:text-white rounded-lg">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <!-- Reactions Bar -->
+    <div class="flex items-center gap-2 mb-3 pb-2 overflow-x-auto shrink-0">
+      <button class="btn-react px-3 py-1.5 glass rounded-full text-lg hover:scale-125 active:scale-90 transition-transform">🔥</button>
+      <button class="btn-react px-3 py-1.5 glass rounded-full text-lg hover:scale-125 active:scale-90 transition-transform">🌷</button>
+      <button class="btn-react px-3 py-1.5 glass rounded-full text-lg hover:scale-125 active:scale-90 transition-transform">⚡</button>
+      <button class="btn-react px-3 py-1.5 glass rounded-full text-lg hover:scale-125 active:scale-90 transition-transform">💀</button>
+      <button class="btn-react px-3 py-1.5 glass rounded-full text-lg hover:scale-125 active:scale-90 transition-transform">❤️</button>
+      <button class="btn-react px-3 py-1.5 glass rounded-full text-lg hover:scale-125 active:scale-90 transition-transform">🎉</button>
+    </div>
+
+    <!-- Messages list -->
+    <div id="chat-messages" class="flex-1 overflow-y-auto space-y-3 mb-4 pr-1 min-h-[260px] max-h-[42vh]">
+      <div class="text-xs text-white/20 text-center py-6">Inicio del canal encriptado de Oracle</div>
+    </div>
+
+    <!-- Chat Form -->
+    <form id="chat-form" class="flex items-center gap-2 shrink-0">
+      <input id="chat-input" type="text" placeholder="Transmitir mensaje..." class="flex-1 py-3.5 px-5 glass-input text-sm tracking-wide" />
+      <button type="submit" class="w-12 h-12 rounded-full bg-amber-500 text-black font-black flex items-center justify-center hover:bg-amber-400 active:scale-95 transition-all shrink-0">
+        <svg class="w-5 h-5 ml-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </form>
+  </div>
+
+  <!-- ═══ BOTTOM DRAWER: PEOPLE & MUSIC QUEUE ═══ -->
+  <div id="people-drawer" class="bottom-drawer p-5 pb-8">
+    <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-4 shrink-0"></div>
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-base font-extrabold">👥 Nodos Conectados</h3>
+      <button id="btn-close-people" class="p-1 text-zinc-400 hover:text-white rounded-lg">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div id="people-list" class="flex-1 overflow-y-auto space-y-2 mb-6 min-h-[200px] max-h-[35vh]">
+      <!-- Online users injected dynamically -->
+    </div>
+
+    <!-- Music Queue Selector -->
+    <div class="shrink-0 pt-4 border-t border-white/10">
+      <h4 class="text-xs font-bold uppercase tracking-wider text-amber-400 mb-2 flex items-center gap-1.5">
+        <span>🎵 Cola Multimedia (Sincronizada)</span>
+      </h4>
+      <div id="music-queue-list" class="glass rounded-2xl p-2.5 max-h-32 overflow-y-auto space-y-1.5 mb-3">
+        <!-- Songs list -->
+      </div>
+      <button id="btn-request-music-sync" class="w-full py-3 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-bold text-white transition-all flex items-center justify-center gap-2">
+        <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        <span>Forzar Sincronización de Audio</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══ ORACLE HANDLE MODAL ═══ -->
+  <div id="handle-modal" class="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-filter blur-md hidden">
+    <div class="glass-heavy max-w-sm w-full rounded-3xl p-6 relative border border-white/15 shadow-2xl">
+      <h3 class="text-lg font-black text-white mb-2">Tu Oracle Handle</h3>
+      <p class="text-xs text-zinc-400 mb-4">Elige un apodo único (@handle) para que otros te reconozcan en la red.</p>
+      <input id="handle-input" type="text" maxlength="15" placeholder="ej. cybertulip" class="w-full py-3 px-4 glass-input text-sm mb-4 font-bold tracking-wide" />
+      <div class="flex gap-2">
+        <button id="btn-cancel-handle" class="flex-1 py-3 rounded-xl glass text-xs font-bold text-zinc-400 hover:text-white">Cancelar</button>
+        <button id="btn-save-handle" class="flex-1 py-3 rounded-xl bg-amber-500 text-black text-xs font-black hover:bg-amber-400">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Application Script -->
+  <script type="module" src="main.js"></script>
 </body>
 </html>

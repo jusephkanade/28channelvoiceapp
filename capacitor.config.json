@@ -1,6 +1,6 @@
 {
   "appId": "com.charlygustav.voiceapp",
-  "appName": " 28E Voice",
+  "appName": "28E Oracle",
   "webDir": "dist",
   "plugins": {
     "FirebaseAuthentication": {
